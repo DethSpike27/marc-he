@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Mon Programme de Marche Progressif</title>
+    <title>Marc-he - Programme de Marche Progressif</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -192,9 +192,9 @@
             <div class="flex justify-between items-start mb-4">
                 <div class="flex-1">
                     <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-2 leading-tight">
-                        <span id="userGreeting">Mon Programme de Marche Progressif</span>
+                        <span id="userGreeting">Marc-he</span>
                     </h1>
-                    <p class="text-sm sm:text-base md:text-lg text-gray-600" id="userObjective">Objectif : Cardio et santé articulaire</p>
+                    <p class="text-sm sm:text-base md:text-lg text-gray-600" id="userObjective">Programme de Marche Progressif</p>
                 </div>
                 <button id="darkModeToggle" class="flex-shrink-0 ml-4 p-2 sm:p-3 rounded-full bg-gray-200 hover:bg-gray-300 transition">
                     <span class="text-xl sm:text-2xl">🌙</span>
@@ -694,13 +694,13 @@
                             Taille
                         </label>
                         <div class="flex gap-3">
-                            <input type="number" id="userHeight" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="170" min="100" max="250">
+                            <input type="number" id="userHeight" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="170" min="100" max="250" step="0.1">
                             <select id="heightUnit" class="px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition">
                                 <option value="cm">cm</option>
                                 <option value="pi">pieds</option>
                             </select>
                         </div>
-                        <p class="text-xs text-gray-600 mt-1">Information pour référence future</p>
+                        <p class="text-xs text-gray-600 mt-1" id="heightHelper">Ex: 170 cm ou 5.5 pieds (5 pieds 6 pouces)</p>
                     </div>
 
                     <!-- Âge -->

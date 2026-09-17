@@ -825,7 +825,11 @@ function initProfile() {
 
     document.getElementById('heightUnit').addEventListener('change', () => {
         updateBMI();
+        updateHeightHelper();
     });
+
+    // Initialiser le helper
+    updateHeightHelper();
 
     saveBtn.addEventListener('click', () => {
         saveUserProfile();
@@ -860,9 +864,9 @@ function updateGreeting() {
     const objectiveEl = document.getElementById('userObjective');
 
     if (profile.name) {
-        greetingEl.textContent = `Programme de Marche de ${profile.name}`;
+        greetingEl.textContent = `Marc-he de ${profile.name}`;
     } else {
-        greetingEl.textContent = 'Mon Programme de Marche Progressif';
+        greetingEl.textContent = 'Marc-he';
     }
 
     const goalTexts = {
@@ -876,7 +880,7 @@ function updateGreeting() {
     if (profile.goal && goalTexts[profile.goal]) {
         objectiveEl.textContent = goalTexts[profile.goal];
     } else {
-        objectiveEl.textContent = 'Objectif : Cardio et santé articulaire';
+        objectiveEl.textContent = 'Programme de Marche Progressif';
     }
 }
 
@@ -934,13 +938,31 @@ function updateBMI() {
         return;
     }
 
-    // Convertir en kg et cm
+    // Convertir en kg et mètres
     const weightKg = weightUnit === 'lb' ? weight / 2.20462 : weight;
-    const heightCm = heightUnit === 'pi' ? height * 30.48 : height;
-    const heightM = heightCm / 100;
+
+    // Conversion pieds en mètres : 1 pied = 0.3048 mètres
+    // Si height = 5.5 pieds (5 pieds 6 pouces), ça fait 5.5 * 0.3048 = 1.6764 m
+    let heightM;
+    if (heightUnit === 'pi') {
+        heightM = height * 0.3048; // Pieds directement en mètres
+    } else {
+        heightM = height / 100; // cm en mètres
+    }
 
     const bmi = weightKg / (heightM * heightM);
     document.getElementById('bmiDisplay').textContent = bmi.toFixed(1);
+}
+
+function updateHeightHelper() {
+    const heightUnit = document.getElementById('heightUnit').value;
+    const helper = document.getElementById('heightHelper');
+
+    if (heightUnit === 'pi') {
+        helper.textContent = 'Ex: 5.5 pieds (5 pieds 6 pouces) ou 6.0 pieds (6 pieds 0 pouces)';
+    } else {
+        helper.textContent = 'Ex: 170 cm';
+    }
 }
 
 function checkFirstTimeUser() {
@@ -950,7 +972,7 @@ function checkFirstTimeUser() {
     if (!hasProfile && !hasSeenWelcome) {
         setTimeout(() => {
             const response = confirm(
-                '👋 Bienvenue dans ton Programme de Marche Progressif !\n\n' +
+                '👋 Bienvenue dans Marc-he !\n\n' +
                 'Pour une meilleure expérience personnalisée, veux-tu configurer ton profil maintenant ?\n\n' +
                 '(Poids, taille, objectif...)\n\n' +
                 'Tu pourras le faire plus tard dans l\'onglet "Profil".'
