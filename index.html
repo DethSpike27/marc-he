@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Mon Programme de Marche Progressif</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script>
+        firebase.initializeApp({
+            apiKey: "AIzaSyDox_ubeadrNre6SxrV01puAbclH4tUORY",
+            authDomain: "nwt-bible-tracker.firebaseapp.com",
+            databaseURL: "https://nwt-bible-tracker-default-rtdb.firebaseio.com",
+            projectId: "nwt-bible-tracker",
+            storageBucket: "nwt-bible-tracker.firebasestorage.app",
+            messagingSenderId: "75223619206",
+            appId: "1:75223619206:web:31dc33ee7de61f6b04e307"
+        });
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            background-attachment: fixed;
+            transition: background 0.3s ease;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            transition: background 0.3s ease;
+        }
+        .dark-mode .glass {
+            background: rgba(30, 30, 50, 0.95);
+            color: #e5e7eb;
+        }
+        .dark-mode .text-gray-800 {
+            color: #f3f4f6 !important;
+        }
+        .dark-mode .text-gray-700 {
+            color: #d1d5db !important;
+        }
+        .dark-mode .text-gray-600 {
+            color: #9ca3af !important;
+        }
+        .dark-mode .bg-gray-50 {
+            background: rgba(55, 65, 81, 0.3) !important;
+        }
+        .dark-mode .hover\:bg-gray-50:hover {
+            background: rgba(75, 85, 99, 0.3) !important;
+        }
+        .checkbox-custom {
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        .checkbox-custom:checked {
+            background-color: #667eea;
+        }
+        .checkbox-custom:checked::after {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .day-selector {
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            font-size: 13px;
+        }
+        .dark-mode .day-selector {
+            background: rgba(55, 65, 81, 0.5);
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+        .day-selector:hover {
+            border-color: #667eea;
+        }
+        .day-selector.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .accordion-content.active {
+            max-height: 500px;
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        .tab-btn {
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab-btn.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            font-size: 14px;
+        }
+        .calendar-day.has-session {
+            background: #10b981;
+            color: white;
+            font-weight: bold;
+        }
+        .badge-card {
+            transition: transform 0.2s ease;
+        }
+        .badge-card:hover {
+            transform: scale(1.05);
+        }
+        .badge-locked {
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        @media (max-width: 640px) {
+            .checkbox-custom {
+                width: 32px;
+                height: 32px;
+            }
+            .checkbox-custom:checked::after {
+                font-size: 22px;
+            }
+            .day-selector {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .timer-display {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-4 md:p-6 lg:p-8">
+    <div class="max-w-6xl mx-auto w-full">
+        <!-- En-tête avec mode sombre -->
+        <header class="glass rounded-lg sm:rounded-xl shadow-lg sm:shadow-2xl p-5 sm:p-6 md:p-8 mb-4 sm:mb-5 md:mb-6">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex-1">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-2 leading-tight">
+                        <span id="userGreeting">Mon Programme de Marche Progressif</span>
+                    </h1>
+                    <p class="text-sm sm:text-base md:text-lg text-gray-600" id="userObjective">Objectif : Cardio et santé articulaire</p>
+                </div>
+                <button id="darkModeToggle" class="flex-shrink-0 ml-4 p-2 sm:p-3 rounded-full bg-gray-200 hover:bg-gray-300 transition">
+                    <span class="text-xl sm:text-2xl">🌙</span>
+                </button>
+            </div>
+
+            <!-- Barre de progression globale -->
+            <div class="mt-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-base sm:text-lg md:text-xl font-semibold text-gray-800">Progression Globale</h3>
+                    <span id="progressText" class="text-xs sm:text-sm md:text-base font-medium text-purple-600 whitespace-nowrap ml-2">0/24 séances</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
+                    <div id="progressBar" class="progress-bar bg-gradient-to-r from-purple-500 to-indigo-600 h-3 sm:h-4 rounded-full" style="width: 0%"></div>
+                </div>
+                <div class="mt-3 flex gap-2 flex-wrap items-center">
+                    <button id="resetBtn" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition active:scale-95">
+                        🔄 Recommencer
+                    </button>
+                    <button id="exportBtn" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition active:scale-95">
+                        📥 Exporter
+                    </button>
+                    <button id="authBtn" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition active:scale-95 flex items-center gap-2">
+                        🔑 <span id="authBtnText">Se connecter</span>
+                    </button>
+                    <span id="syncLabel" class="text-xs text-gray-600" style="display:none"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation par onglets -->
+        <div class="glass rounded-lg sm:rounded-xl shadow-lg mb-4 sm:mb-5 md:mb-6 overflow-x-auto">
+            <div class="flex border-b border-gray-200">
+                <button class="tab-btn active text-gray-800" data-tab="programme">📋 Programme</button>
+                <button class="tab-btn text-gray-800" data-tab="timer">⏱️ Timer</button>
+                <button class="tab-btn text-gray-800" data-tab="calendrier">📅 Calendrier</button>
+                <button class="tab-btn text-gray-800" data-tab="stats">📊 Stats</button>
+                <button class="tab-btn text-gray-800" data-tab="badges">🏆 Badges</button>
+                <button class="tab-btn text-gray-800" data-tab="profil">👤 Profil</button>
+                <button class="tab-btn text-gray-800" data-tab="conseils">💡 Conseils</button>
+            </div>
+        </div>
+
+        <!-- Onglet Programme -->
+        <div id="tab-programme" class="tab-content active">
+            <section class="mb-4 sm:mb-5 md:mb-6">
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4 px-1 sm:px-2">Programme de 8 Semaines</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+                    <!-- Semaines 1-2 -->
+                    <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6">
+                        <div class="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800">Semaines 1-2</h3>
+                                <p class="text-xs sm:text-sm text-gray-600 mt-1">15 minutes</p>
+                            </div>
+                            <span class="bg-green-100 text-green-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Débutant</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Rythme lent, ou 2 × 10 min si douleur</p>
+
+                        <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+                            <p class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Mes jours de marche :</p>
+                            <div class="grid grid-cols-7 gap-1 sm:gap-2" id="daySelector1">
+                                <button class="day-selector" data-day="L">L</button>
+                                <button class="day-selector" data-day="M">M</button>
+                                <button class="day-selector" data-day="M2">M</button>
+                                <button class="day-selector" data-day="J">J</button>
+                                <button class="day-selector" data-day="V">V</button>
+                                <button class="day-selector" data-day="S">S</button>
+                                <button class="day-selector" data-day="D">D</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 sm:space-y-3">
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="1" data-day="1" data-duration="15">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 1</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day1_1"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="1" data-day="1">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="1" data-day="2" data-duration="15">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 2</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day1_2"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="1" data-day="2">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="1" data-day="3" data-duration="15">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 3</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day1_3"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="1" data-day="3">📝</button>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Semaines 3-4 -->
+                    <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6">
+                        <div class="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800">Semaines 3-4</h3>
+                                <p class="text-xs sm:text-sm text-gray-600 mt-1">20 minutes</p>
+                            </div>
+                            <span class="bg-blue-100 text-blue-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Progression</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Rythme modéré, capable de parler</p>
+
+                        <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+                            <p class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Mes jours de marche :</p>
+                            <div class="grid grid-cols-7 gap-1 sm:gap-2" id="daySelector2">
+                                <button class="day-selector" data-day="L">L</button>
+                                <button class="day-selector" data-day="M">M</button>
+                                <button class="day-selector" data-day="M2">M</button>
+                                <button class="day-selector" data-day="J">J</button>
+                                <button class="day-selector" data-day="V">V</button>
+                                <button class="day-selector" data-day="S">S</button>
+                                <button class="day-selector" data-day="D">D</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 sm:space-y-3">
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="2" data-day="1" data-duration="20">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 1</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day2_1"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="2" data-day="1">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="2" data-day="2" data-duration="20">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 2</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day2_2"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="2" data-day="2">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="2" data-day="3" data-duration="20">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 3</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day2_3"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="2" data-day="3">📝</button>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Semaines 5-6 -->
+                    <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6">
+                        <div class="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800">Semaines 5-6</h3>
+                                <p class="text-xs sm:text-sm text-gray-600 mt-1">25 minutes</p>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Intermédiaire</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Rythme modéré, avec balancement des bras</p>
+
+                        <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+                            <p class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Mes jours de marche :</p>
+                            <div class="grid grid-cols-7 gap-1 sm:gap-2" id="daySelector3">
+                                <button class="day-selector" data-day="L">L</button>
+                                <button class="day-selector" data-day="M">M</button>
+                                <button class="day-selector" data-day="M2">M</button>
+                                <button class="day-selector" data-day="J">J</button>
+                                <button class="day-selector" data-day="V">V</button>
+                                <button class="day-selector" data-day="S">S</button>
+                                <button class="day-selector" data-day="D">D</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 sm:space-y-3">
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="3" data-day="1" data-duration="25">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 1</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day3_1"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="3" data-day="1">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="3" data-day="2" data-duration="25">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 2</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day3_2"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="3" data-day="2">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="3" data-day="3" data-duration="25">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 3</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day3_3"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="3" data-day="3">📝</button>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Semaines 7-8 -->
+                    <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6">
+                        <div class="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-800">Semaines 7-8</h3>
+                                <p class="text-xs sm:text-sm text-gray-600 mt-1">30 minutes</p>
+                            </div>
+                            <span class="bg-purple-100 text-purple-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Avancé</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Rythme modéré, progression naturelle</p>
+
+                        <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+                            <p class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Mes jours de marche :</p>
+                            <div class="grid grid-cols-7 gap-1 sm:gap-2" id="daySelector4">
+                                <button class="day-selector" data-day="L">L</button>
+                                <button class="day-selector" data-day="M">M</button>
+                                <button class="day-selector" data-day="M2">M</button>
+                                <button class="day-selector" data-day="J">J</button>
+                                <button class="day-selector" data-day="V">V</button>
+                                <button class="day-selector" data-day="S">S</button>
+                                <button class="day-selector" data-day="D">D</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 sm:space-y-3">
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="4" data-day="1" data-duration="30">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 1</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day4_1"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="4" data-day="1">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="4" data-day="2" data-duration="30">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 2</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day4_2"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="4" data-day="2">📝</button>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                                <div class="flex items-center space-x-3 sm:space-x-4">
+                                    <input type="checkbox" class="checkbox-custom" data-week="4" data-day="3" data-duration="30">
+                                    <span class="text-sm sm:text-base text-gray-700">Séance 3</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500" id="day4_3"></span>
+                                    <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="4" data-day="3">📝</button>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Semaines 9+ (Mode maintien) -->
+            <section id="maintenanceSection" class="mb-4 sm:mb-5 md:mb-6 hidden">
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4 px-1 sm:px-2">Semaines 9+ - Niveau Maintien</h2>
+                <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6">
+                    <div class="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800">Programme continu</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 mt-1">30 minutes - 3× par semaine</p>
+                        </div>
+                        <span class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Maintien ✨</span>
+                    </div>
+                    <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Félicitations ! Continue à ce rythme pour maintenir ta forme cardiovasculaire.</p>
+
+                    <div class="mb-3 p-3 bg-gray-50 rounded-lg">
+                        <p class="text-xs sm:text-sm font-medium text-gray-700 mb-2">Mes jours de marche :</p>
+                        <div class="grid grid-cols-7 gap-1 sm:gap-2" id="daySelectorMaintenance">
+                            <button class="day-selector" data-day="L">L</button>
+                            <button class="day-selector" data-day="M">M</button>
+                            <button class="day-selector" data-day="M2">M</button>
+                            <button class="day-selector" data-day="J">J</button>
+                            <button class="day-selector" data-day="V">V</button>
+                            <button class="day-selector" data-day="S">S</button>
+                            <button class="day-selector" data-day="D">D</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 sm:space-y-3">
+                        <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                            <div class="flex items-center space-x-3 sm:space-x-4">
+                                <input type="checkbox" class="checkbox-custom maintenance-checkbox" data-session="1" data-duration="30">
+                                <span class="text-sm sm:text-base text-gray-700">Séance 1</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-500" id="dayMaintenance_1"></span>
+                                <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="maintenance" data-day="1">📝</button>
+                            </div>
+                        </label>
+                        <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                            <div class="flex items-center space-x-3 sm:space-x-4">
+                                <input type="checkbox" class="checkbox-custom maintenance-checkbox" data-session="2" data-duration="30">
+                                <span class="text-sm sm:text-base text-gray-700">Séance 2</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-500" id="dayMaintenance_2"></span>
+                                <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="maintenance" data-day="2">📝</button>
+                            </div>
+                        </label>
+                        <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition active:bg-gray-100">
+                            <div class="flex items-center space-x-3 sm:space-x-4">
+                                <input type="checkbox" class="checkbox-custom maintenance-checkbox" data-session="3" data-duration="30">
+                                <span class="text-sm sm:text-base text-gray-700">Séance 3</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-500" id="dayMaintenance_3"></span>
+                                <button class="text-xs text-blue-500 hover:text-blue-700 note-btn" data-week="maintenance" data-day="3">📝</button>
+                            </div>
+                        </label>
+                    </div>
+                    <button id="newWeekBtn" class="mt-4 w-full text-sm px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition active:scale-95">
+                        ➡️ Nouvelle semaine
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Onglet Timer -->
+        <div id="tab-timer" class="tab-content">
+            <div class="glass rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Timer de Marche (Aller/Retour)</h2>
+
+                <div class="text-center mb-6">
+                    <!-- Indicateur de phase -->
+                    <div class="mb-4 p-3 rounded-lg transition-all" id="phaseIndicator">
+                        <p class="text-lg font-bold" id="phaseText">Prêt à démarrer</p>
+                    </div>
+
+                    <div class="timer-display text-purple-600 mb-4" id="timerDisplay">00:00</div>
+
+                    <!-- Barre de progression -->
+                    <div class="w-full max-w-md mx-auto mb-4">
+                        <div class="flex justify-between text-xs text-gray-600 mb-1">
+                            <span>🚶 Aller</span>
+                            <span id="halfwayLabel">Mi-temps</span>
+                            <span>🔙 Retour</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div id="timerProgressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-4">Sélectionne la durée :</p>
+                    <div class="flex gap-2 justify-center flex-wrap mb-6">
+                        <button class="duration-btn px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition" data-duration="15">15 min</button>
+                        <button class="duration-btn px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition" data-duration="20">20 min</button>
+                        <button class="duration-btn px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition" data-duration="25">25 min</button>
+                        <button class="duration-btn px-4 py-2 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 transition" data-duration="30">30 min</button>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-center mb-6">
+                    <button id="startTimerBtn" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition active:scale-95">▶️ Démarrer</button>
+                    <button id="pauseTimerBtn" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-bold transition active:scale-95 hidden">⏸️ Pause</button>
+                    <button id="stopTimerBtn" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold transition active:scale-95">⏹️ Stop</button>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold text-gray-800 mb-2">🔔 Mi-temps (Demi-tour)</h3>
+                    <p class="text-sm text-gray-700">Une alerte sonnera à la moitié du temps pour te rappeler de faire demi-tour !</p>
+                </div>
+
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-gray-800 mb-2">💡 Astuce</h3>
+                    <p class="text-sm text-gray-700">Le timer t'alertera avec un son à la mi-temps et à la fin. Assure-toi que les notifications sont activées !</p>
+                </div>
+
+                <!-- Calories brûlées -->
+                <div class="mt-6 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg">
+                    <h3 class="font-bold text-gray-800 mb-2">🔥 Calories estimées</h3>
+                    <p class="text-3xl font-bold text-orange-600" id="caloriesDisplay">0</p>
+                    <p class="text-xs text-gray-600 mt-1">Basé sur ton profil et marche modérée</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Calendrier -->
+        <div id="tab-calendrier" class="tab-content">
+            <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">📅 Historique</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <button id="prevMonth" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition">◀️</button>
+                    <h3 class="text-xl font-bold text-gray-800" id="calendarMonth">Septembre 2026</h3>
+                    <button id="nextMonth" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition">▶️</button>
+                </div>
+                <div class="grid grid-cols-7 gap-2 mb-2">
+                    <div class="text-center font-bold text-sm text-gray-600">L</div>
+                    <div class="text-center font-bold text-sm text-gray-600">M</div>
+                    <div class="text-center font-bold text-sm text-gray-600">M</div>
+                    <div class="text-center font-bold text-sm text-gray-600">J</div>
+                    <div class="text-center font-bold text-sm text-gray-600">V</div>
+                    <div class="text-center font-bold text-sm text-gray-600">S</div>
+                    <div class="text-center font-bold text-sm text-gray-600">D</div>
+                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+            </div>
+        </div>
+
+        <!-- Onglet Statistiques -->
+        <div id="tab-stats" class="tab-content">
+            <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 mb-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Statistiques</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gradient-to-br from-green-400 to-green-600 p-5 rounded-xl text-white">
+                        <p class="text-sm opacity-90">Total séances</p>
+                        <p class="text-4xl font-bold" id="totalSessions">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-400 to-blue-600 p-5 rounded-xl text-white">
+                        <p class="text-sm opacity-90">Minutes totales</p>
+                        <p class="text-4xl font-bold" id="totalMinutes">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-400 to-red-600 p-5 rounded-xl text-white">
+                        <p class="text-sm opacity-90">Calories brûlées</p>
+                        <p class="text-4xl font-bold" id="totalCalories">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Badges -->
+        <div id="tab-badges" class="tab-content">
+            <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">🏆 Tes Badges</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="badgesContainer">
+                    <!-- Badges seront générés dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Profil -->
+        <div id="tab-profil" class="tab-content">
+            <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">👤 Mon Profil</h2>
+
+                <div class="max-w-2xl mx-auto">
+                    <!-- Nom -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2">
+                            Prénom / Surnom
+                        </label>
+                        <input type="text" id="userName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="Ex: Marc">
+                    </div>
+
+                    <!-- Poids -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2">
+                            Poids
+                        </label>
+                        <div class="flex gap-3">
+                            <input type="number" id="userWeight" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="295" min="50" max="500">
+                            <select id="weightUnit" class="px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition">
+                                <option value="lb">lb</option>
+                                <option value="kg">kg</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Utilisé pour calculer les calories brûlées</p>
+                    </div>
+
+                    <!-- Taille -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2">
+                            Taille
+                        </label>
+                        <div class="flex gap-3">
+                            <input type="number" id="userHeight" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="170" min="100" max="250">
+                            <select id="heightUnit" class="px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition">
+                                <option value="cm">cm</option>
+                                <option value="pi">pieds</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">Information pour référence future</p>
+                    </div>
+
+                    <!-- Âge -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2">
+                            Âge (optionnel)
+                        </label>
+                        <input type="number" id="userAge" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="Ex: 35" min="10" max="120">
+                    </div>
+
+                    <!-- Objectif -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2">
+                            Mon objectif principal
+                        </label>
+                        <select id="userGoal" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition">
+                            <option value="cardio">Améliorer mon cardio</option>
+                            <option value="weight">Perdre du poids</option>
+                            <option value="joints">Protéger mes articulations</option>
+                            <option value="health">Santé générale</option>
+                            <option value="habit">Créer une habitude</option>
+                        </select>
+                    </div>
+
+                    <!-- Bouton de sauvegarde -->
+                    <button id="saveProfile" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-lg transition active:scale-95 shadow-lg">
+                        💾 Sauvegarder mon profil
+                    </button>
+
+                    <!-- Info calculées -->
+                    <div class="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                        <h3 class="font-bold text-gray-800 mb-3">📊 Mes statistiques calculées</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-white p-3 rounded-lg">
+                                <p class="text-xs text-gray-600">Calories/minute (marche modérée)</p>
+                                <p class="text-2xl font-bold text-purple-600" id="caloriesPerMin">4.5</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg">
+                                <p class="text-xs text-gray-600">IMC (si taille renseignée)</p>
+                                <p class="text-2xl font-bold text-indigo-600" id="bmiDisplay">--</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-3">* Les calculs sont des estimations basées sur des moyennes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Conseils -->
+        <div id="tab-conseils" class="tab-content">
+            <section class="mb-4">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 px-1 sm:px-2">Règles d'Or et Astuces</h2>
+                <div class="space-y-3 sm:space-y-4">
+                    <div class="glass rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
+                        <button class="accordion-btn w-full p-4 sm:p-5 text-left flex justify-between items-center hover:bg-gray-50 transition active:bg-gray-100">
+                            <div class="flex items-center space-x-3 sm:space-x-4">
+                                <span class="text-xl sm:text-2xl flex-shrink-0">💬</span>
+                                <h3 class="font-bold text-sm sm:text-base md:text-lg text-gray-800">Le test de la parole</h3>
+                            </div>
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="accordion-content px-4 sm:px-5 pb-4 sm:pb-5">
+                            <p class="text-sm sm:text-base text-gray-700 leading-relaxed">Si tu ne peux pas parler pendant que tu marches, c'est que tu vas trop vite. Ralentis ton rythme jusqu'à ce que tu puisses tenir une conversation sans être essoufflé.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
+                        <button class="accordion-btn w-full p-4 sm:p-5 text-left flex justify-between items-center hover:bg-gray-50 transition active:bg-gray-100">
+                            <div class="flex items-center space-x-3 sm:space-x-4">
+                                <span class="text-xl sm:text-2xl flex-shrink-0">⚠️</span>
+                                <h3 class="font-bold text-sm sm:text-base md:text-lg text-gray-800">La règle de la douleur</h3>
+                            </div>
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="accordion-content px-4 sm:px-5 pb-4 sm:pb-5">
+                            <p class="text-sm sm:text-base text-gray-700 leading-relaxed">Une fatigue musculaire est normale, mais si une douleur aiguë au dos ou au genou survient, arrête immédiatement. Divise en deux sessions si nécessaire.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
+                        <button class="accordion-btn w-full p-4 sm:p-5 text-left flex justify-between items-center hover:bg-gray-50 transition active:bg-gray-100">
+                            <div class="flex items-center space-x-3 sm:space-x-4">
+                                <span class="text-xl sm:text-2xl flex-shrink-0">🛣️</span>
+                                <h3 class="font-bold text-sm sm:text-base md:text-lg text-gray-800">Le terrain</h3>
+                            </div>
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transform transition-transform accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="accordion-content px-4 sm:px-5 pb-4 sm:pb-5">
+                            <p class="text-sm sm:text-base text-gray-700 leading-relaxed">Marche uniquement sur du plat (asphalte ou poussière de roche). Aucune pente pour les 4 premières semaines. Évite le béton.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-4">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 px-1 sm:px-2">Routine Anti-Bureau (2 minutes)</h2>
+                <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        <div class="flex space-x-3 sm:space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">👀</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm sm:text-base text-gray-800 mb-1">Posture de marche</h3>
+                                <p class="text-xs sm:text-sm text-gray-700">Regarde à l'horizon, rentre le nombril à 10-20%.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3 sm:space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">🔄</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm sm:text-base text-gray-800 mb-1">Échauffement</h3>
+                                <p class="text-xs sm:text-sm text-gray-700">10 rotations de chevilles de chaque côté.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3 sm:space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">🏋️</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm sm:text-base text-gray-800 mb-1">Déblocage du bassin</h3>
+                                <p class="text-xs sm:text-sm text-gray-700">10 bascules du bassin.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3 sm:space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">🚶</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm sm:text-base text-gray-800 mb-1">Activation</h3>
+                                <p class="text-xs sm:text-sm text-gray-700">30 secondes de marche sur place.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 text-center">
+            <p class="text-gray-600 text-xs sm:text-sm md:text-base">💪 Chaque pas compte ! Reste constant et écoute ton corps.</p>
+        </footer>
+    </div>
+
+    <!-- Modal pour les notes -->
+    <div id="noteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="glass rounded-xl max-w-lg w-full p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">📝 Note de séance</h3>
+            <textarea id="noteText" class="w-full p-3 border-2 border-gray-300 rounded-lg mb-4 h-32 resize-none" placeholder="Comment t'es-tu senti ? Douleurs ? Météo ?"></textarea>
+            <div class="flex gap-2 justify-end">
+                <button id="cancelNote" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg transition">Annuler</button>
+                <button id="saveNote" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
