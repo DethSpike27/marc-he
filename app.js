@@ -910,6 +910,8 @@ function getSessionHistory() {
 function initCalendar() {
     const prevBtn = document.getElementById('prevMonth');
     const nextBtn = document.getElementById('nextMonth');
+    const clearTodayBtn = document.getElementById('clearTodayHistory');
+    const clearAllBtn = document.getElementById('clearAllHistory');
 
     prevBtn.addEventListener('click', () => {
         currentMonth--;
@@ -928,6 +930,83 @@ function initCalendar() {
         }
         renderCalendar();
     });
+
+    clearTodayBtn.addEventListener('click', () => {
+        const confirmMsg = currentLanguage === 'fr'
+            ? "Effacer l'historique d'aujourd'hui ?\n\nCela enlèvera la date verte du calendrier mais ne décochera pas les séances."
+            : "Clear today's history?\n\nThis will remove the green date from the calendar but won't uncheck sessions.";
+
+        if (confirm(confirmMsg)) {
+            clearTodayHistory();
+        }
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+        const confirmMsg = currentLanguage === 'fr'
+            ? "⚠️ Effacer TOUT l'historique ?\n\nToutes les dates vertes du calendrier seront supprimées.\nLes séances cochées ne seront pas affectées.\n\nContinuer ?"
+            : "⚠️ Clear ALL history?\n\nAll green dates will be removed from the calendar.\nChecked sessions won't be affected.\n\nContinue?";
+
+        if (confirm(confirmMsg)) {
+            clearAllHistory();
+        }
+    });
+}
+
+function clearTodayHistory() {
+    const today = new Date().toISOString().split('T')[0];
+    const history = getSessionHistory();
+
+    if (history[today]) {
+        delete history[today];
+        localStorage.setItem('sessionHistory', JSON.stringify(history));
+
+        // Also remove all session dates for today
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const key = localStorage.key(i);
+            if (key && key.includes('_date')) {
+                const date = localStorage.getItem(key);
+                if (date === today) {
+                    localStorage.removeItem(key);
+                }
+            }
+        }
+
+        console.log('🗑️ Cleared history for today:', today);
+        renderCalendar();
+        saveToFirebase();
+
+        const successMsg = currentLanguage === 'fr'
+            ? "✅ Historique d'aujourd'hui effacé !"
+            : "✅ Today's history cleared!";
+        alert(successMsg);
+    } else {
+        const noDataMsg = currentLanguage === 'fr'
+            ? "Aucun historique pour aujourd'hui."
+            : "No history for today.";
+        alert(noDataMsg);
+    }
+}
+
+function clearAllHistory() {
+    // Clear all history
+    localStorage.removeItem('sessionHistory');
+
+    // Clear all session dates
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.includes('_date')) {
+            localStorage.removeItem(key);
+        }
+    }
+
+    console.log('🗑️ Cleared all history');
+    renderCalendar();
+    saveToFirebase();
+
+    const successMsg = currentLanguage === 'fr'
+        ? "✅ Tout l'historique a été effacé !"
+        : "✅ All history cleared!";
+    alert(successMsg);
 }
 
 function renderCalendar() {

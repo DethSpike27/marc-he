@@ -543,6 +543,17 @@
         <div id="tab-calendrier" class="tab-content">
             <div class="glass rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">📅 Historique</h2>
+
+                <!-- Boutons de gestion de l'historique -->
+                <div class="flex gap-2 flex-wrap mb-4">
+                    <button id="clearTodayHistory" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition active:scale-95">
+                        🗑️ Effacer aujourd'hui
+                    </button>
+                    <button id="clearAllHistory" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition active:scale-95">
+                        🗑️ Effacer tout l'historique
+                    </button>
+                </div>
+
                 <div class="flex justify-between items-center mb-4">
                     <button id="prevMonth" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition">◀️</button>
                     <h3 class="text-xl font-bold text-gray-800" id="calendarMonth">Septembre 2026</h3>
