@@ -1583,7 +1583,11 @@ function loadUserProfile() {
     document.getElementById('userName').value = profile.name || '';
     document.getElementById('userWeight').value = profile.weight || 250;
     document.getElementById('weightUnit').value = profile.weightUnit || 'lb';
-    document.getElementById('heightUnit').value = profile.heightUnit || 'ft';
+
+    const heightUnitSelect = document.getElementById('heightUnit');
+    const heightUnitValue = profile.heightUnit || 'ft';
+    heightUnitSelect.value = heightUnitValue;
+    console.log('Height unit set to:', heightUnitValue, 'Select value:', heightUnitSelect.value);
 
     // Load height based on unit
     if (profile.heightUnit === 'ft' || !profile.heightUnit) {
