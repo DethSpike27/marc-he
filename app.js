@@ -138,7 +138,7 @@ const translations = {
         estimatesNote: '* Les calculs sont des estimations basées sur des moyennes',
         weightHelper: 'Utilisé pour calculer les calories brûlées',
         heightHelperCm: 'Ex: 170 cm',
-        heightHelperFt: 'Ex: 5.5 pieds (5 pieds 6 pouces) ou 6.0 pieds (6 pieds 0 pouces)',
+        heightHelperFt: 'Ex: 5.5 ft (5 pieds 6 pouces) ou 6.0 ft (6 pieds 0 pouces)',
 
         // Tips
         tipsTitle: 'Règles d\'Or et Astuces',
@@ -1681,11 +1681,12 @@ function updateBMI() {
 function updateHeightHelper() {
     const heightUnit = document.getElementById('heightUnit').value;
     const helper = document.getElementById('heightHelper');
+    const t = translations[currentLanguage];
 
     if (heightUnit === 'pi') {
-        helper.textContent = 'Ex: 5.5 pieds (5 pieds 6 pouces) ou 6.0 pieds (6 pieds 0 pouces)';
+        helper.textContent = t.heightHelperFt;
     } else {
-        helper.textContent = 'Ex: 170 cm';
+        helper.textContent = t.heightHelperCm;
     }
 }
 
