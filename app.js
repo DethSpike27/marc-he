@@ -1,7 +1,344 @@
 // ========== CONFIGURATION ==========
 // Valeurs par défaut - seront remplacées par le profil utilisateur
-let USER_WEIGHT_LBS = 295;
-let CALORIES_PER_MIN = 4.5; // Sera recalculé selon le poids
+let USER_WEIGHT_LBS = 250;
+let CALORIES_PER_MIN = 3.8; // Sera recalculé selon le poids
+let currentLanguage = 'fr';
+
+// ========== TRADUCTIONS ==========
+const translations = {
+    fr: {
+        // Header
+        appTitle: 'Marc-he',
+        appSubtitle: 'Programme de Marche Progressif',
+
+        // Tabs
+        tabProgram: '📋 Programme',
+        tabCalendar: '📅 Calendrier',
+        tabStats: '📊 Stats',
+        tabBadges: '🏆 Badges',
+        tabProfile: '👤 Profil',
+        tabTips: '💡 Conseils',
+
+        // Buttons
+        btnReset: '🔄 Recommencer',
+        btnExport: '📥 Exporter',
+        btnLogin: 'Se connecter',
+        btnLogout: 'Se déconnecter',
+
+        // Progress
+        progressGlobal: 'Progression Globale',
+        sessions: 'séances',
+
+        // Weeks
+        weeks12: 'Semaines 1-2',
+        weeks34: 'Semaines 3-4',
+        weeks56: 'Semaines 5-6',
+        weeks78: 'Semaines 7-8',
+        weeks9plus: 'Semaines 9+',
+
+        // Levels
+        levelBeginner: 'Débutant',
+        levelProgress: 'Progression',
+        levelIntermediate: 'Intermédiaire',
+        levelAdvanced: 'Avancé',
+        levelMaintenance: 'Maintien ✨',
+
+        // Duration
+        minutes: 'minutes',
+        min: 'min',
+
+        // Instructions
+        instr12: 'Rythme lent, ou 2 × 10 min si douleur',
+        instr34: 'Rythme modéré, capable de parler',
+        instr56: 'Rythme modéré, avec balancement des bras',
+        instr78: 'Rythme modéré, progression naturelle',
+        instr9plus: 'Félicitations ! Continue à ce rythme pour maintenir ta forme cardiovasculaire.',
+
+        // Days
+        myWalkingDays: 'Mes jours de marche :',
+        dayL: 'Lundi',
+        dayM: 'Mardi',
+        dayM2: 'Mercredi',
+        dayJ: 'Jeudi',
+        dayV: 'Vendredi',
+        dayS: 'Samedi',
+        dayD: 'Dimanche',
+
+        // Session
+        session: 'Séance',
+        newWeek: '➡️ Nouvelle semaine',
+
+        // Calendar
+        calendarTitle: '📅 Historique',
+        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+
+        // Stats
+        statsTitle: '📊 Statistiques',
+        totalSessions: 'Total séances',
+        totalMinutes: 'Minutes totales',
+        caloriesBurned: 'Calories brûlées',
+        walkingMinutes: 'Minutes de marche',
+
+        // Badges
+        badgesTitle: '🏆 Tes Badges',
+        badgeFirst: 'Premier Pas',
+        badgeFirstDesc: 'Première séance complétée',
+        badgeWeek1: 'Une Semaine',
+        badgeWeek1Desc: '3 séances en une semaine',
+        badgeConsistent: 'Régularité',
+        badgeConsistentDesc: '5 séances complétées',
+        badgeTenner: 'Double Chiffre',
+        badgeTennerDesc: '10 séances complétées',
+        badgeHalfWay: 'Mi-Parcours',
+        badgeHalfWayDesc: '12 séances (50% du programme)',
+        badgeChampion: 'Champion',
+        badgeChampionDesc: '24 séances complétées',
+        badgeMarathon: 'Marathonien',
+        badgeMarathonDesc: '100 minutes cumulées',
+        badgeWarrior: 'Guerrier',
+        badgeWarriorDesc: '500 minutes cumulées',
+        badgeLegend: 'Légende',
+        badgeLegendDesc: '1000 minutes cumulées',
+
+        // Profile
+        profileTitle: '👤 Mon Profil',
+        firstName: 'Prénom / Surnom',
+        weight: 'Poids',
+        height: 'Taille',
+        age: 'Âge (optionnel)',
+        goal: 'Mon objectif principal',
+        goalCardio: 'Améliorer mon cardio',
+        goalWeight: 'Perdre du poids',
+        goalJoints: 'Protéger mes articulations',
+        goalHealth: 'Santé générale',
+        goalHabit: 'Créer une habitude',
+        saveProfile: '💾 Sauvegarder mon profil',
+        calculatedStats: '📊 Mes statistiques calculées',
+        caloriesPerMin: 'Calories/minute (marche modérée)',
+        bmi: 'IMC (si taille renseignée)',
+        estimatesNote: '* Les calculs sont des estimations basées sur des moyennes',
+        weightHelper: 'Utilisé pour calculer les calories brûlées',
+        heightHelperCm: 'Ex: 170 cm',
+        heightHelperFt: 'Ex: 5.5 pieds (5 pieds 6 pouces) ou 6.0 pieds (6 pieds 0 pouces)',
+
+        // Tips
+        tipsTitle: 'Règles d\'Or et Astuces',
+        tipTalkTest: 'Le test de la parole',
+        tipTalkTestDesc: 'Si tu ne peux pas parler pendant que tu marches, c\'est que tu vas trop vite. Ralentis ton rythme jusqu\'à ce que tu puisses tenir une conversation sans être essoufflé.',
+        tipPainRule: 'La règle de la douleur',
+        tipPainRuleDesc: 'Une fatigue musculaire est normale, mais si une douleur aiguë au dos ou au genou survient, arrête immédiatement. Divise en deux sessions si nécessaire.',
+        tipTerrain: 'Le terrain',
+        tipTerrainDesc: 'Marche uniquement sur du plat (asphalte ou poussière de roche). Aucune pente pour les 4 premières semaines. Évite le béton.',
+        routineTitle: 'Routine Anti-Bureau (2 minutes)',
+        routinePosture: 'Posture de marche',
+        routinePostureDesc: 'Regarde à l\'horizon, rentre le nombril à 10-20%.',
+        routineWarmup: 'Échauffement',
+        routineWarmupDesc: '10 rotations de chevilles de chaque côté.',
+        routinePelvis: 'Déblocage du bassin',
+        routinePelvisDesc: '10 bascules du bassin.',
+        routineActivation: 'Activation',
+        routineActivationDesc: '30 secondes de marche sur place.',
+
+        // Footer
+        footerText: '💪 Chaque pas compte ! Reste constant et écoute ton corps.',
+
+        // Notes
+        noteTitle: '📝 Note de séance',
+        notePlaceholder: 'Comment t\'es-tu senti ? Douleurs ? Météo ?',
+        noteCancel: 'Annuler',
+        noteSave: 'Sauvegarder',
+
+        // Alerts
+        alertComplete: '🎉 Félicitations ! Tu as complété les 8 premières semaines !\n\nLe mode maintien est maintenant débloqué ! 💪',
+        alertReset: '⚠️ Es-tu sûr de vouloir recommencer au niveau débutant ?\n\nCela effacera toute ta progression.',
+        alertResetConfirm: 'Dernière confirmation : Tout sera effacé. Continuer ?',
+        alertNewWeek: 'Commencer une nouvelle semaine ? Cela réinitialisera les cases actuelles.',
+        alertMaxDays: 'Tu peux sélectionner maximum 3 jours par semaine',
+        alertProfileSaved: '✅ Profil sauvegardé !\n\nBienvenue {{name}} ! Tes paramètres ont été mis à jour.',
+        alertWelcome: '👋 Bienvenue dans Marc-he !\n\nPour une meilleure expérience personnalisée, veux-tu configurer ton profil maintenant ?\n\n(Poids, taille, objectif...)\n\nTu pourras le faire plus tard dans l\'onglet "Profil".',
+        alertNewBadge: '🎉 Nouveau badge débloqué !\n\n{{emoji}} {{name}}\n{{desc}}',
+        alertLogout: 'Se déconnecter de Google ?',
+
+        // Sync
+        syncToday: 'sync : aujourd\'hui',
+        syncYesterday: 'sync : hier',
+        syncDaysAgo: 'sync : il y a {{days}}j',
+
+        // Misc
+        programTitle: 'Programme de 8 Semaines',
+        continuousProgram: 'Programme continu',
+        maintenanceDesc: '30 minutes - 3× par semaine',
+        exampleName: 'Ex: Marc',
+        exampleAge: 'Ex: 35',
+        champion: 'Champion'
+    },
+    en: {
+        // Header
+        appTitle: 'Walk-On',
+        appSubtitle: 'Progressive Walking Program',
+
+        // Tabs
+        tabProgram: '📋 Program',
+        tabCalendar: '📅 Calendar',
+        tabStats: '📊 Stats',
+        tabBadges: '🏆 Badges',
+        tabProfile: '👤 Profile',
+        tabTips: '💡 Tips',
+
+        // Buttons
+        btnReset: '🔄 Reset',
+        btnExport: '📥 Export',
+        btnLogin: 'Sign In',
+        btnLogout: 'Sign Out',
+
+        // Progress
+        progressGlobal: 'Overall Progress',
+        sessions: 'sessions',
+
+        // Weeks
+        weeks12: 'Weeks 1-2',
+        weeks34: 'Weeks 3-4',
+        weeks56: 'Weeks 5-6',
+        weeks78: 'Weeks 7-8',
+        weeks9plus: 'Weeks 9+',
+
+        // Levels
+        levelBeginner: 'Beginner',
+        levelProgress: 'Progress',
+        levelIntermediate: 'Intermediate',
+        levelAdvanced: 'Advanced',
+        levelMaintenance: 'Maintenance ✨',
+
+        // Duration
+        minutes: 'minutes',
+        min: 'min',
+
+        // Instructions
+        instr12: 'Slow pace, or 2 × 10 min if pain',
+        instr34: 'Moderate pace, able to talk',
+        instr56: 'Moderate pace, with arm swing',
+        instr78: 'Moderate pace, natural progression',
+        instr9plus: 'Congratulations! Keep up this pace to maintain your cardiovascular fitness.',
+
+        // Days
+        myWalkingDays: 'My walking days:',
+        dayL: 'Monday',
+        dayM: 'Tuesday',
+        dayM2: 'Wednesday',
+        dayJ: 'Thursday',
+        dayV: 'Friday',
+        dayS: 'Saturday',
+        dayD: 'Sunday',
+
+        // Session
+        session: 'Session',
+        newWeek: '➡️ New week',
+
+        // Calendar
+        calendarTitle: '📅 History',
+        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+
+        // Stats
+        statsTitle: '📊 Statistics',
+        totalSessions: 'Total sessions',
+        totalMinutes: 'Total minutes',
+        caloriesBurned: 'Calories burned',
+        walkingMinutes: 'Walking minutes',
+
+        // Badges
+        badgesTitle: '🏆 Your Badges',
+        badgeFirst: 'First Step',
+        badgeFirstDesc: 'First session completed',
+        badgeWeek1: 'One Week',
+        badgeWeek1Desc: '3 sessions in one week',
+        badgeConsistent: 'Consistency',
+        badgeConsistentDesc: '5 sessions completed',
+        badgeTenner: 'Double Digits',
+        badgeTennerDesc: '10 sessions completed',
+        badgeHalfWay: 'Halfway There',
+        badgeHalfWayDesc: '12 sessions (50% of program)',
+        badgeChampion: 'Champion',
+        badgeChampionDesc: '24 sessions completed',
+        badgeMarathon: 'Marathoner',
+        badgeMarathonDesc: '100 cumulative minutes',
+        badgeWarrior: 'Warrior',
+        badgeWarriorDesc: '500 cumulative minutes',
+        badgeLegend: 'Legend',
+        badgeLegendDesc: '1000 cumulative minutes',
+
+        // Profile
+        profileTitle: '👤 My Profile',
+        firstName: 'First Name / Nickname',
+        weight: 'Weight',
+        height: 'Height',
+        age: 'Age (optional)',
+        goal: 'My main goal',
+        goalCardio: 'Improve my cardio',
+        goalWeight: 'Lose weight',
+        goalJoints: 'Protect my joints',
+        goalHealth: 'General health',
+        goalHabit: 'Create a habit',
+        saveProfile: '💾 Save my profile',
+        calculatedStats: '📊 My calculated statistics',
+        caloriesPerMin: 'Calories/minute (moderate walk)',
+        bmi: 'BMI (if height provided)',
+        estimatesNote: '* Calculations are estimates based on averages',
+        weightHelper: 'Used to calculate calories burned',
+        heightHelperCm: 'Ex: 170 cm',
+        heightHelperFt: 'Ex: 5.5 feet (5 feet 6 inches) or 6.0 feet (6 feet 0 inches)',
+
+        // Tips
+        tipsTitle: 'Golden Rules and Tips',
+        tipTalkTest: 'The talk test',
+        tipTalkTestDesc: 'If you can\'t talk while walking, you\'re going too fast. Slow down until you can hold a conversation without being out of breath.',
+        tipPainRule: 'The pain rule',
+        tipPainRuleDesc: 'Muscle fatigue is normal, but if sharp back or knee pain occurs, stop immediately. Split into two sessions if necessary.',
+        tipTerrain: 'The terrain',
+        tipTerrainDesc: 'Walk only on flat surfaces (asphalt or crushed rock). No slopes for the first 4 weeks. Avoid concrete.',
+        routineTitle: 'Anti-Desk Routine (2 minutes)',
+        routinePosture: 'Walking posture',
+        routinePostureDesc: 'Look at the horizon, engage core 10-20%.',
+        routineWarmup: 'Warmup',
+        routineWarmupDesc: '10 ankle rotations on each side.',
+        routinePelvis: 'Pelvis release',
+        routinePelvisDesc: '10 pelvic tilts.',
+        routineActivation: 'Activation',
+        routineActivationDesc: '30 seconds of marching in place.',
+
+        // Footer
+        footerText: '💪 Every step counts! Stay consistent and listen to your body.',
+
+        // Notes
+        noteTitle: '📝 Session Note',
+        notePlaceholder: 'How did you feel? Any pain? Weather?',
+        noteCancel: 'Cancel',
+        noteSave: 'Save',
+
+        // Alerts
+        alertComplete: '🎉 Congratulations! You completed the first 8 weeks!\n\nMaintenance mode is now unlocked! 💪',
+        alertReset: '⚠️ Are you sure you want to restart at beginner level?\n\nThis will erase all your progress.',
+        alertResetConfirm: 'Final confirmation: Everything will be deleted. Continue?',
+        alertNewWeek: 'Start a new week? This will reset the current checkboxes.',
+        alertMaxDays: 'You can select a maximum of 3 days per week',
+        alertProfileSaved: '✅ Profile saved!\n\nWelcome {{name}}! Your settings have been updated.',
+        alertWelcome: '👋 Welcome to Walk-On!\n\nFor a better personalized experience, would you like to configure your profile now?\n\n(Weight, height, goal...)\n\nYou can do it later in the "Profile" tab.',
+        alertNewBadge: '🎉 New badge unlocked!\n\n{{emoji}} {{name}}\n{{desc}}',
+        alertLogout: 'Sign out of Google?',
+
+        // Sync
+        syncToday: 'sync: today',
+        syncYesterday: 'sync: yesterday',
+        syncDaysAgo: 'sync: {{days}}d ago',
+
+        // Misc
+        programTitle: '8-Week Program',
+        continuousProgram: 'Continuous program',
+        maintenanceDesc: '30 minutes - 3× per week',
+        exampleName: 'Ex: John',
+        exampleAge: 'Ex: 35',
+        champion: 'Champion'
+    }
+};
 
 const dayNames = {
     'L': 'Lundi',
@@ -13,25 +350,180 @@ const dayNames = {
     'D': 'Dimanche'
 };
 
-const badges = [
-    { id: 'first', name: 'Premier Pas', desc: 'Première séance complétée', emoji: '👟', requirement: 1 },
-    { id: 'week1', name: 'Une Semaine', desc: '3 séances en une semaine', emoji: '🗓️', requirement: 3 },
-    { id: 'consistent', name: 'Régularité', desc: '5 séances complétées', emoji: '📈', requirement: 5 },
-    { id: 'tenner', name: 'Double Chiffre', desc: '10 séances complétées', emoji: '🔟', requirement: 10 },
-    { id: 'halfWay', name: 'Mi-Parcours', desc: '12 séances (50% du programme)', emoji: '⭐', requirement: 12 },
-    { id: 'champion', name: 'Champion', desc: '24 séances complétées', emoji: '🏆', requirement: 24 },
-    { id: 'marathon', name: 'Marathonien', desc: '100 minutes cumulées', emoji: '🎯', requirement: 100, type: 'minutes' },
-    { id: 'warrior', name: 'Guerrier', desc: '500 minutes cumulées', emoji: '⚡', requirement: 500, type: 'minutes' },
-    { id: 'legend', name: 'Légende', desc: '1000 minutes cumulées', emoji: '👑', requirement: 1000, type: 'minutes' },
-];
+function getBadges() {
+    const t = translations[currentLanguage];
+    return [
+        { id: 'first', name: t.badgeFirst, desc: t.badgeFirstDesc, emoji: '👟', requirement: 1 },
+        { id: 'week1', name: t.badgeWeek1, desc: t.badgeWeek1Desc, emoji: '🗓️', requirement: 3 },
+        { id: 'consistent', name: t.badgeConsistent, desc: t.badgeConsistentDesc, emoji: '📈', requirement: 5 },
+        { id: 'tenner', name: t.badgeTenner, desc: t.badgeTennerDesc, emoji: '🔟', requirement: 10 },
+        { id: 'halfWay', name: t.badgeHalfWay, desc: t.badgeHalfWayDesc, emoji: '⭐', requirement: 12 },
+        { id: 'champion', name: t.badgeChampion, desc: t.badgeChampionDesc, emoji: '🏆', requirement: 24 },
+        { id: 'marathon', name: t.badgeMarathon, desc: t.badgeMarathonDesc, emoji: '🎯', requirement: 100, type: 'minutes' },
+        { id: 'warrior', name: t.badgeWarrior, desc: t.badgeWarriorDesc, emoji: '⚡', requirement: 500, type: 'minutes' },
+        { id: 'legend', name: t.badgeLegend, desc: t.badgeLegendDesc, emoji: '👑', requirement: 1000, type: 'minutes' },
+    ];
+}
+
+// ========== GESTION DE LA LANGUE ==========
+function initLanguage() {
+    currentLanguage = localStorage.getItem('language') || 'fr';
+    const selector = document.getElementById('languageSelector');
+    if (selector) {
+        selector.value = currentLanguage;
+        selector.addEventListener('change', (e) => {
+            currentLanguage = e.target.value;
+            localStorage.setItem('language', currentLanguage);
+            updateLanguage();
+            saveToFirebase();
+        });
+    }
+    updateLanguage();
+}
+
+function updateLanguage() {
+    const t = translations[currentLanguage];
+
+    // Update day names
+    if (currentLanguage === 'fr') {
+        dayNames['L'] = 'Lundi';
+        dayNames['M'] = 'Mardi';
+        dayNames['M2'] = 'Mercredi';
+        dayNames['J'] = 'Jeudi';
+        dayNames['V'] = 'Vendredi';
+        dayNames['S'] = 'Samedi';
+        dayNames['D'] = 'Dimanche';
+    } else {
+        dayNames['L'] = 'Monday';
+        dayNames['M'] = 'Tuesday';
+        dayNames['M2'] = 'Wednesday';
+        dayNames['J'] = 'Thursday';
+        dayNames['V'] = 'Friday';
+        dayNames['S'] = 'Saturday';
+        dayNames['D'] = 'Sunday';
+    }
+
+    // Update all text content via data attributes
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (t[key]) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = t[key];
+            } else {
+                el.textContent = t[key];
+            }
+        }
+    });
+
+    // Update title and subtitle
+    const greeting = document.getElementById('userGreeting');
+    const objective = document.getElementById('userObjective');
+    if (greeting && !greeting.textContent.includes(' de ') && !greeting.textContent.includes(' - ') && !greeting.textContent.includes("'s")) {
+        greeting.textContent = t.appTitle;
+    }
+    if (objective && !objective.textContent.startsWith('Objectif') && !objective.textContent.startsWith('Goal')) {
+        objective.textContent = t.appSubtitle;
+    }
+
+    // Update manual translations for complex HTML sections
+    updateProgramSections();
+    updateProfileSection();
+    updateTipsSection();
+    updateFooter();
+    updateNoteModal();
+
+    // Re-render dynamic content
+    updateGreeting();
+    renderBadges();
+    renderCalendar();
+    updateStats();
+    updateProgress();
+
+    // Update day labels
+    for (let week = 1; week <= 4; week++) {
+        const saved = JSON.parse(localStorage.getItem(`${week}_days`) || '[]');
+        updateDayLabels(week, saved);
+    }
+    const savedMaintenance = JSON.parse(localStorage.getItem('maintenance_days') || '[]');
+    updateDayLabels('maintenance', savedMaintenance);
+}
+
+function updateProgramSections() {
+    const t = translations[currentLanguage];
+
+    // Update program title
+    const programTitle = document.querySelector('#tab-programme h2');
+    if (programTitle) programTitle.textContent = t.programTitle;
+
+    // Update session labels (Séance 1, 2, 3...)
+    const sessionLabels = document.querySelectorAll('.text-gray-700');
+    sessionLabels.forEach((label) => {
+        if (label.textContent.trim().startsWith('Séance') || label.textContent.trim().startsWith('Session')) {
+            const num = label.textContent.match(/\d+/);
+            if (num) {
+                label.textContent = `${t.session} ${num[0]}`;
+            }
+        }
+    });
+
+    // Update "Mes jours de marche"
+    document.querySelectorAll('p.font-medium').forEach(p => {
+        if (p.textContent.includes('jours de marche') || p.textContent.includes('walking days')) {
+            p.textContent = t.myWalkingDays;
+        }
+    });
+}
+
+function updateProfileSection() {
+    const t = translations[currentLanguage];
+
+    // Update profile title
+    const profileTitle = document.querySelector('#tab-profil h2');
+    if (profileTitle) profileTitle.textContent = t.profileTitle;
+
+    // Update calculated stats title
+    const statsTitle = document.querySelector('#tab-profil h3');
+    if (statsTitle && statsTitle.textContent.includes('statistiques')) {
+        statsTitle.textContent = t.calculatedStats;
+    }
+
+    // Update helper text for height
+    updateHeightHelper();
+}
+
+function updateTipsSection() {
+    const t = translations[currentLanguage];
+
+    // Update tips title
+    const tipsTitle = document.querySelector('#tab-conseils section:first-child h2');
+    if (tipsTitle) tipsTitle.textContent = t.tipsTitle;
+
+    // Update routine title
+    const routineTitle = document.querySelector('#tab-conseils section:last-child h2');
+    if (routineTitle) routineTitle.textContent = t.routineTitle;
+}
+
+function updateFooter() {
+    const t = translations[currentLanguage];
+    const footer = document.querySelector('footer p');
+    if (footer) footer.textContent = t.footerText;
+}
+
+function updateNoteModal() {
+    const t = translations[currentLanguage];
+    const noteTitle = document.querySelector('#noteModal h3');
+    const noteText = document.getElementById('noteText');
+    const cancelBtn = document.getElementById('cancelNote');
+    const saveBtn = document.getElementById('saveNote');
+
+    if (noteTitle) noteTitle.textContent = t.noteTitle;
+    if (noteText) noteText.placeholder = t.notePlaceholder;
+    if (cancelBtn) cancelBtn.textContent = t.noteCancel;
+    if (saveBtn) saveBtn.textContent = t.noteSave;
+}
 
 // ========== ÉTAT DE L'APPLICATION ==========
 let currentNoteTarget = null;
-let timerInterval = null;
-let timerSeconds = 0;
-let timerDuration = 900; // 15 min par défaut
-let timerRunning = false;
-let timerHalfwayAlerted = false; // Pour la mi-temps
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 let statsChart = null;
@@ -43,12 +535,12 @@ let fbSyncingCount = 0;
 
 // ========== INITIALISATION ==========
 document.addEventListener('DOMContentLoaded', () => {
+    initLanguage();
     initProfile();
     initTabs();
     initDarkMode();
     initDaySelectors();
     initCheckboxes();
-    initTimer();
     initCalendar();
     initStats();
     initBadges();
@@ -151,7 +643,8 @@ function setupDaySelector(selectorId, week) {
                 if (selectedBtns.length < 3) {
                     btn.classList.add('selected');
                 } else {
-                    alert('Tu peux sélectionner maximum 3 jours par semaine');
+                    const t = translations[currentLanguage];
+                    alert(t.alertMaxDays);
                     return;
                 }
             }
@@ -195,7 +688,8 @@ function initCheckboxes() {
             const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
             if (checkedCount === 24) {
                 setTimeout(() => {
-                    alert('🎉 Félicitations ! Tu as complété les 8 premières semaines !\n\nLe mode maintien est maintenant débloqué ! 💪');
+                    const t = translations[currentLanguage];
+                    alert(t.alertComplete);
                     document.getElementById('maintenanceSection').classList.remove('hidden');
                 }, 300);
             }
@@ -212,8 +706,9 @@ function initCheckboxes() {
     });
 
     resetBtn.addEventListener('click', () => {
-        if (confirm('⚠️ Es-tu sûr de vouloir recommencer au niveau débutant ?\n\nCela effacera toute ta progression.')) {
-            if (confirm('Dernière confirmation : Tout sera effacé. Continuer ?')) {
+        const t = translations[currentLanguage];
+        if (confirm(t.alertReset)) {
+            if (confirm(t.alertResetConfirm)) {
                 localStorage.clear();
                 location.reload();
             }
@@ -222,7 +717,8 @@ function initCheckboxes() {
 
     if (newWeekBtn) {
         newWeekBtn.addEventListener('click', () => {
-            if (confirm('Commencer une nouvelle semaine ? Cela réinitialisera les cases actuelles.')) {
+            const t = translations[currentLanguage];
+            if (confirm(t.alertNewWeek)) {
                 maintenanceCheckboxes.forEach(cb => {
                     cb.checked = false;
                     saveCheckbox(cb);
@@ -274,9 +770,10 @@ function updateProgress() {
     const checkboxes = document.querySelectorAll('.checkbox-custom:not(.maintenance-checkbox)');
     const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
     const percentage = (checkedCount / 24) * 100;
+    const t = translations[currentLanguage];
 
     document.getElementById('progressBar').style.width = `${percentage}%`;
-    document.getElementById('progressText').textContent = `${checkedCount}/24 séances`;
+    document.getElementById('progressText').textContent = `${checkedCount}/24 ${t.sessions}`;
 
     if (checkedCount >= 24) {
         document.getElementById('maintenanceSection').classList.remove('hidden');
@@ -295,169 +792,6 @@ function saveSessionToHistory(date, duration) {
 
 function getSessionHistory() {
     return JSON.parse(localStorage.getItem('sessionHistory') || '{}');
-}
-
-// ========== TIMER ==========
-function initTimer() {
-    const durationBtns = document.querySelectorAll('.duration-btn');
-    const startBtn = document.getElementById('startTimerBtn');
-    const pauseBtn = document.getElementById('pauseTimerBtn');
-    const stopBtn = document.getElementById('stopTimerBtn');
-
-    durationBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            timerDuration = parseInt(btn.dataset.duration) * 60;
-            timerSeconds = 0;
-            timerHalfwayAlerted = false;
-            updateTimerDisplay();
-            updateCaloriesDisplay();
-            updatePhaseIndicator();
-        });
-    });
-
-    startBtn.addEventListener('click', () => {
-        if (!timerRunning) {
-            timerRunning = true;
-            timerHalfwayAlerted = false;
-            startBtn.classList.add('hidden');
-            pauseBtn.classList.remove('hidden');
-            timerInterval = setInterval(() => {
-                timerSeconds++;
-                updateTimerDisplay();
-                updateCaloriesDisplay();
-                updatePhaseIndicator();
-
-                // Alerte mi-temps (demi-tour)
-                const halfway = Math.floor(timerDuration / 2);
-                if (timerSeconds === halfway && !timerHalfwayAlerted) {
-                    timerHalfwayAlerted = true;
-                    playNotificationSound();
-                    playNotificationSound(); // Double son pour la mi-temps
-
-                    if (Notification.permission === 'granted') {
-                        new Notification('🔔 Mi-temps - Fais demi-tour !', {
-                            body: 'C\'est le moment de retourner vers ton point de départ.',
-                            icon: '🔙'
-                        });
-                    } else {
-                        alert('🔔 MI-TEMPS !\n\nFais demi-tour maintenant pour retourner à ton point de départ ! 🔙');
-                    }
-                }
-
-                // Fin du timer
-                if (timerSeconds >= timerDuration) {
-                    stopTimer();
-                    playNotificationSound();
-                    playNotificationSound();
-                    playNotificationSound(); // Triple son pour la fin
-
-                    if (Notification.permission === 'granted') {
-                        new Notification('🎉 Marche terminée !', {
-                            body: 'Bravo ! Tu as complété ta séance.',
-                            icon: '👟'
-                        });
-                    } else {
-                        alert('🎉 MARCHE TERMINÉE !\n\nBravo ! Tu as complété ta séance ! 👟');
-                    }
-                }
-            }, 1000);
-        }
-    });
-
-    pauseBtn.addEventListener('click', () => {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        startBtn.classList.remove('hidden');
-        pauseBtn.classList.add('hidden');
-    });
-
-    stopBtn.addEventListener('click', () => {
-        stopTimer();
-    });
-}
-
-function stopTimer() {
-    clearInterval(timerInterval);
-    timerRunning = false;
-    timerSeconds = 0;
-    timerHalfwayAlerted = false;
-    document.getElementById('startTimerBtn').classList.remove('hidden');
-    document.getElementById('pauseTimerBtn').classList.add('hidden');
-    updateTimerDisplay();
-    updateCaloriesDisplay();
-    updatePhaseIndicator();
-}
-
-function updateTimerDisplay() {
-    const minutes = Math.floor(timerSeconds / 60);
-    const seconds = timerSeconds % 60;
-    document.getElementById('timerDisplay').textContent =
-        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-    // Mettre à jour la barre de progression
-    const progress = (timerSeconds / timerDuration) * 100;
-    document.getElementById('timerProgressBar').style.width = `${progress}%`;
-}
-
-function updatePhaseIndicator() {
-    const phaseIndicator = document.getElementById('phaseIndicator');
-    const phaseText = document.getElementById('phaseText');
-    const halfwayLabel = document.getElementById('halfwayLabel');
-    const halfway = Math.floor(timerDuration / 2);
-
-    if (!timerRunning && timerSeconds === 0) {
-        phaseIndicator.style.background = '#e5e7eb';
-        phaseText.textContent = 'Prêt à démarrer';
-        phaseText.style.color = '#4b5563';
-        halfwayLabel.textContent = 'Mi-temps';
-        halfwayLabel.style.color = '';
-        halfwayLabel.style.fontWeight = '';
-    } else if (timerSeconds < halfway) {
-        // Phase ALLER
-        const remaining = halfway - timerSeconds;
-        const minRemaining = Math.floor(remaining / 60);
-        const secRemaining = remaining % 60;
-        phaseIndicator.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
-        phaseText.textContent = `🚶 ALLER - Demi-tour dans ${minRemaining}:${String(secRemaining).padStart(2, '0')}`;
-        phaseText.style.color = 'white';
-        halfwayLabel.textContent = 'Mi-temps 🔔';
-        halfwayLabel.style.color = '#3b82f6';
-        halfwayLabel.style.fontWeight = 'bold';
-    } else {
-        // Phase RETOUR
-        const remaining = timerDuration - timerSeconds;
-        const minRemaining = Math.floor(remaining / 60);
-        const secRemaining = remaining % 60;
-        phaseIndicator.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
-        phaseText.textContent = `🔙 RETOUR - Arrivée dans ${minRemaining}:${String(secRemaining).padStart(2, '0')}`;
-        phaseText.style.color = 'white';
-        halfwayLabel.textContent = 'Mi-temps ✅';
-        halfwayLabel.style.color = '#8b5cf6';
-        halfwayLabel.style.fontWeight = 'bold';
-    }
-}
-
-function updateCaloriesDisplay() {
-    const calories = Math.round((timerSeconds / 60) * CALORIES_PER_MIN);
-    document.getElementById('caloriesDisplay').textContent = calories;
-}
-
-function playNotificationSound() {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.frequency.value = 800;
-    oscillator.type = 'sine';
-
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
 }
 
 // ========== CALENDRIER ==========
@@ -485,10 +819,9 @@ function initCalendar() {
 }
 
 function renderCalendar() {
-    const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    const t = translations[currentLanguage];
 
-    document.getElementById('calendarMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    document.getElementById('calendarMonth').textContent = `${t.monthNames[currentMonth]} ${currentYear}`;
 
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -516,7 +849,8 @@ function renderCalendar() {
         const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         if (history[dateStr]) {
             dayDiv.classList.add('has-session');
-            dayDiv.title = `Séance de ${history[dateStr].duration} min`;
+            const sessionText = currentLanguage === 'fr' ? `Séance de ${history[dateStr].duration} min` : `${history[dateStr].duration} min session`;
+            dayDiv.title = sessionText;
         }
 
         grid.appendChild(dayDiv);
@@ -566,12 +900,14 @@ function renderChart(history) {
         statsChart.destroy();
     }
 
+    const t = translations[currentLanguage];
+
     statsChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Minutes de marche',
+                label: t.walkingMinutes,
                 data: data,
                 backgroundColor: 'rgba(102, 126, 234, 0.6)',
                 borderColor: 'rgba(102, 126, 234, 1)',
@@ -612,6 +948,7 @@ function renderBadges() {
     const totalSessions = Array.from(checkboxes).filter(cb => cb.checked).length;
     const history = getSessionHistory();
     const totalMinutes = Object.values(history).reduce((sum, session) => sum + session.duration, 0);
+    const badges = getBadges();
 
     container.innerHTML = '';
 
@@ -640,6 +977,7 @@ function checkBadges() {
     const totalSessions = Array.from(checkboxes).filter(cb => cb.checked).length;
     const history = getSessionHistory();
     const totalMinutes = Object.values(history).reduce((sum, session) => sum + session.duration, 0);
+    const badges = getBadges();
 
     const newlyUnlocked = [];
 
@@ -673,7 +1011,12 @@ function unlockBadge(badgeId) {
 }
 
 function showBadgeNotification(badge) {
-    alert(`🎉 Nouveau badge débloqué !\n\n${badge.emoji} ${badge.name}\n${badge.desc}`);
+    const t = translations[currentLanguage];
+    const msg = t.alertNewBadge
+        .replace('{{emoji}}', badge.emoji)
+        .replace('{{name}}', badge.name)
+        .replace('{{desc}}', badge.desc);
+    alert(msg);
 }
 
 // ========== NOTES ==========
@@ -840,17 +1183,17 @@ function loadUserProfile() {
     const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
 
     document.getElementById('userName').value = profile.name || '';
-    document.getElementById('userWeight').value = profile.weight || 295;
+    document.getElementById('userWeight').value = profile.weight || 250;
     document.getElementById('weightUnit').value = profile.weightUnit || 'lb';
     document.getElementById('userHeight').value = profile.height || '';
-    document.getElementById('heightUnit').value = profile.heightUnit || 'cm';
+    document.getElementById('heightUnit').value = profile.heightUnit || 'pi';
     document.getElementById('userAge').value = profile.age || '';
     document.getElementById('userGoal').value = profile.goal || 'cardio';
 
     // Charger le poids pour les calculs
     const weightInLbs = profile.weightUnit === 'kg'
-        ? (profile.weight || 295) * 2.20462
-        : (profile.weight || 295);
+        ? (profile.weight || 250) * 2.20462
+        : (profile.weight || 250);
 
     USER_WEIGHT_LBS = weightInLbs;
     updateCaloriesPerMinute();
@@ -862,32 +1205,34 @@ function updateGreeting() {
     const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
     const greetingEl = document.getElementById('userGreeting');
     const objectiveEl = document.getElementById('userObjective');
+    const t = translations[currentLanguage];
 
     if (profile.name) {
-        greetingEl.textContent = `Marc-he de ${profile.name}`;
+        const appName = currentLanguage === 'fr' ? 'Marc-he' : 'Walk-On';
+        greetingEl.textContent = currentLanguage === 'fr' ? `${appName} de ${profile.name}` : `${profile.name}'s ${appName}`;
     } else {
-        greetingEl.textContent = 'Marc-he';
+        greetingEl.textContent = t.appTitle;
     }
 
     const goalTexts = {
-        'cardio': 'Objectif : Améliorer mon cardio',
-        'weight': 'Objectif : Perdre du poids',
-        'joints': 'Objectif : Protéger mes articulations',
-        'health': 'Objectif : Santé générale',
-        'habit': 'Objectif : Créer une habitude de marche'
+        'cardio': currentLanguage === 'fr' ? `Objectif : ${t.goalCardio}` : `Goal: ${t.goalCardio}`,
+        'weight': currentLanguage === 'fr' ? `Objectif : ${t.goalWeight}` : `Goal: ${t.goalWeight}`,
+        'joints': currentLanguage === 'fr' ? `Objectif : ${t.goalJoints}` : `Goal: ${t.goalJoints}`,
+        'health': currentLanguage === 'fr' ? `Objectif : ${t.goalHealth}` : `Goal: ${t.goalHealth}`,
+        'habit': currentLanguage === 'fr' ? `Objectif : ${t.goalHabit}` : `Goal: ${t.goalHabit}`
     };
 
     if (profile.goal && goalTexts[profile.goal]) {
         objectiveEl.textContent = goalTexts[profile.goal];
     } else {
-        objectiveEl.textContent = 'Programme de Marche Progressif';
+        objectiveEl.textContent = t.appSubtitle;
     }
 }
 
 function saveUserProfile() {
     const profile = {
         name: document.getElementById('userName').value,
-        weight: parseFloat(document.getElementById('userWeight').value) || 295,
+        weight: parseFloat(document.getElementById('userWeight').value) || 250,
         weightUnit: document.getElementById('weightUnit').value,
         height: parseFloat(document.getElementById('userHeight').value) || 0,
         heightUnit: document.getElementById('heightUnit').value,
@@ -909,12 +1254,13 @@ function saveUserProfile() {
     updateStats();
     saveToFirebase();
 
-    const name = profile.name || 'Champion';
-    alert(`✅ Profil sauvegardé !\n\nBienvenue ${name} ! Tes paramètres ont été mis à jour.`);
+    const t = translations[currentLanguage];
+    const name = profile.name || t.champion;
+    alert(t.alertProfileSaved.replace('{{name}}', name));
 }
 
 function updateCaloriesPerMinute() {
-    const weight = parseFloat(document.getElementById('userWeight').value) || 295;
+    const weight = parseFloat(document.getElementById('userWeight').value) || 250;
     const unit = document.getElementById('weightUnit').value;
 
     const weightInLbs = unit === 'kg' ? weight * 2.20462 : weight;
@@ -971,12 +1317,8 @@ function checkFirstTimeUser() {
 
     if (!hasProfile && !hasSeenWelcome) {
         setTimeout(() => {
-            const response = confirm(
-                '👋 Bienvenue dans Marc-he !\n\n' +
-                'Pour une meilleure expérience personnalisée, veux-tu configurer ton profil maintenant ?\n\n' +
-                '(Poids, taille, objectif...)\n\n' +
-                'Tu pourras le faire plus tard dans l\'onglet "Profil".'
-            );
+            const t = translations[currentLanguage];
+            const response = confirm(t.alertWelcome);
 
             if (response) {
                 // Ouvrir l'onglet Profil
@@ -995,24 +1337,27 @@ function initFirebase() {
     const authBtnText = document.getElementById('authBtnText');
 
     function updateAuthUI(user) {
+        const t = translations[currentLanguage];
         if (user) {
-            const firstName = (user.displayName || '').split(' ')[0] || 'Utilisateur';
+            const firstName = (user.displayName || '').split(' ')[0] || 'User';
             authBtnText.textContent = firstName;
             authBtn.title = user.email;
             authBtn.onclick = () => {
-                if (confirm('Se déconnecter de Google ?')) {
+                if (confirm(t.alertLogout)) {
                     firebase.auth().signOut();
                 }
             };
             document.getElementById('syncLabel').style.display = 'inline';
         } else {
-            authBtnText.textContent = 'Se connecter';
-            authBtn.title = 'Se connecter avec Google pour synchroniser';
+            authBtnText.textContent = t.btnLogin;
+            const tooltipText = currentLanguage === 'fr' ? 'Se connecter avec Google pour synchroniser' : 'Sign in with Google to sync';
+            authBtn.title = tooltipText;
             authBtn.onclick = () => {
                 firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
                     .catch(err => {
                         if (err.code !== 'auth/popup-closed-by-user') {
-                            alert('Erreur de connexion : ' + err.message);
+                            const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
+                            alert(errorMsg + err.message);
                         }
                     });
             };
@@ -1117,6 +1462,10 @@ function initFirebase() {
             }
         }, err => {
             console.error('Firebase listener error:', err);
+            const errorMsg = currentLanguage === 'fr'
+                ? `❌ Erreur de synchronisation Firebase :\n\n${err.message}\n\nVérifie les règles de sécurité dans la console Firebase.`
+                : `❌ Firebase sync error:\n\n${err.message}\n\nCheck security rules in Firebase console.`;
+            alert(errorMsg);
         });
     });
 }
@@ -1126,11 +1475,12 @@ function updateSyncIndicator(isoDate) {
     if (!el || !isoDate) return;
 
     const diff = Math.floor((Date.now() - new Date(isoDate)) / 86400000);
+    const t = translations[currentLanguage];
     let text;
 
-    if (diff === 0) text = 'sync : aujourd\'hui';
-    else if (diff === 1) text = 'sync : hier';
-    else text = `sync : il y a ${diff}j`;
+    if (diff === 0) text = t.syncToday;
+    else if (diff === 1) text = t.syncYesterday;
+    else text = t.syncDaysAgo.replace('{{days}}', diff);
 
     el.textContent = text;
     el.title = new Date(isoDate).toLocaleString();
