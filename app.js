@@ -32,11 +32,15 @@ const translations = {
         sessions: 'séances',
 
         // Weeks
-        weeks12: 'Semaines 1-2',
-        weeks34: 'Semaines 3-4',
-        weeks56: 'Semaines 5-6',
-        weeks78: 'Semaines 7-8',
-        weeks9plus: 'Semaines 9+',
+        week1: 'Semaine 1',
+        week2: 'Semaine 2',
+        week3: 'Semaine 3',
+        week4: 'Semaine 4',
+        week5: 'Semaine 5',
+        week6: 'Semaine 6',
+        week7: 'Semaine 7',
+        week8: 'Semaine 8',
+        week9plus: 'Semaine 9+',
 
         // Levels
         levelBeginner: 'Débutant',
@@ -85,16 +89,22 @@ const translations = {
         badgesTitle: '🏆 Tes Badges',
         badgeFirst: 'Premier Pas',
         badgeFirstDesc: 'Première séance complétée',
-        badgeWeek1: 'Une Semaine',
-        badgeWeek1Desc: '3 séances en une semaine',
-        badgeConsistent: 'Régularité',
-        badgeConsistentDesc: '5 séances complétées',
-        badgeTenner: 'Double Chiffre',
-        badgeTennerDesc: '10 séances complétées',
-        badgeHalfWay: 'Mi-Parcours',
-        badgeHalfWayDesc: '12 séances (50% du programme)',
-        badgeChampion: 'Champion',
-        badgeChampionDesc: '24 séances complétées',
+        badgeWeek1: 'Semaine 1',
+        badgeWeek1Desc: '3 séances complétées',
+        badgeWeek2: 'Semaine 2',
+        badgeWeek2Desc: '6 séances complétées',
+        badgeWeek3: 'Semaine 3',
+        badgeWeek3Desc: '9 séances complétées',
+        badgeWeek4: 'Semaine 4',
+        badgeWeek4Desc: '12 séances complétées',
+        badgeWeek5: 'Semaine 5',
+        badgeWeek5Desc: '15 séances complétées',
+        badgeWeek6: 'Semaine 6',
+        badgeWeek6Desc: '18 séances complétées',
+        badgeWeek7: 'Semaine 7',
+        badgeWeek7Desc: '21 séances complétées',
+        badgeWeek8: 'Semaine 8',
+        badgeWeek8Desc: '24 séances complétées',
         badgeMarathon: 'Marathonien',
         badgeMarathonDesc: '100 minutes cumulées',
         badgeWarrior: 'Guerrier',
@@ -200,11 +210,15 @@ const translations = {
         sessions: 'sessions',
 
         // Weeks
-        weeks12: 'Weeks 1-2',
-        weeks34: 'Weeks 3-4',
-        weeks56: 'Weeks 5-6',
-        weeks78: 'Weeks 7-8',
-        weeks9plus: 'Weeks 9+',
+        week1: 'Week 1',
+        week2: 'Week 2',
+        week3: 'Week 3',
+        week4: 'Week 4',
+        week5: 'Week 5',
+        week6: 'Week 6',
+        week7: 'Week 7',
+        week8: 'Week 8',
+        week9plus: 'Week 9+',
 
         // Levels
         levelBeginner: 'Beginner',
@@ -253,16 +267,22 @@ const translations = {
         badgesTitle: '🏆 Your Badges',
         badgeFirst: 'First Step',
         badgeFirstDesc: 'First session completed',
-        badgeWeek1: 'One Week',
-        badgeWeek1Desc: '3 sessions in one week',
-        badgeConsistent: 'Consistency',
-        badgeConsistentDesc: '5 sessions completed',
-        badgeTenner: 'Double Digits',
-        badgeTennerDesc: '10 sessions completed',
-        badgeHalfWay: 'Halfway There',
-        badgeHalfWayDesc: '12 sessions (50% of program)',
-        badgeChampion: 'Champion',
-        badgeChampionDesc: '24 sessions completed',
+        badgeWeek1: 'Week 1',
+        badgeWeek1Desc: '3 sessions completed',
+        badgeWeek2: 'Week 2',
+        badgeWeek2Desc: '6 sessions completed',
+        badgeWeek3: 'Week 3',
+        badgeWeek3Desc: '9 sessions completed',
+        badgeWeek4: 'Week 4',
+        badgeWeek4Desc: '12 sessions completed',
+        badgeWeek5: 'Week 5',
+        badgeWeek5Desc: '15 sessions completed',
+        badgeWeek6: 'Week 6',
+        badgeWeek6Desc: '18 sessions completed',
+        badgeWeek7: 'Week 7',
+        badgeWeek7Desc: '21 sessions completed',
+        badgeWeek8: 'Week 8',
+        badgeWeek8Desc: '24 sessions completed',
         badgeMarathon: 'Marathoner',
         badgeMarathonDesc: '100 cumulative minutes',
         badgeWarrior: 'Warrior',
@@ -358,11 +378,14 @@ function getBadges() {
     const t = translations[currentLanguage];
     return [
         { id: 'first', name: t.badgeFirst, desc: t.badgeFirstDesc, emoji: '👟', requirement: 1 },
-        { id: 'week1', name: t.badgeWeek1, desc: t.badgeWeek1Desc, emoji: '🗓️', requirement: 3 },
-        { id: 'consistent', name: t.badgeConsistent, desc: t.badgeConsistentDesc, emoji: '📈', requirement: 5 },
-        { id: 'tenner', name: t.badgeTenner, desc: t.badgeTennerDesc, emoji: '🔟', requirement: 10 },
-        { id: 'halfWay', name: t.badgeHalfWay, desc: t.badgeHalfWayDesc, emoji: '⭐', requirement: 12 },
-        { id: 'champion', name: t.badgeChampion, desc: t.badgeChampionDesc, emoji: '🏆', requirement: 24 },
+        { id: 'week1', name: t.badgeWeek1, desc: t.badgeWeek1Desc, emoji: '1️⃣', requirement: 3 },
+        { id: 'week2', name: t.badgeWeek2, desc: t.badgeWeek2Desc, emoji: '2️⃣', requirement: 6 },
+        { id: 'week3', name: t.badgeWeek3, desc: t.badgeWeek3Desc, emoji: '3️⃣', requirement: 9 },
+        { id: 'week4', name: t.badgeWeek4, desc: t.badgeWeek4Desc, emoji: '4️⃣', requirement: 12 },
+        { id: 'week5', name: t.badgeWeek5, desc: t.badgeWeek5Desc, emoji: '5️⃣', requirement: 15 },
+        { id: 'week6', name: t.badgeWeek6, desc: t.badgeWeek6Desc, emoji: '6️⃣', requirement: 18 },
+        { id: 'week7', name: t.badgeWeek7, desc: t.badgeWeek7Desc, emoji: '7️⃣', requirement: 21 },
+        { id: 'week8', name: t.badgeWeek8, desc: t.badgeWeek8Desc, emoji: '8️⃣', requirement: 24 },
         { id: 'marathon', name: t.badgeMarathon, desc: t.badgeMarathonDesc, emoji: '🎯', requirement: 100, type: 'minutes' },
         { id: 'warrior', name: t.badgeWarrior, desc: t.badgeWarriorDesc, emoji: '⚡', requirement: 500, type: 'minutes' },
         { id: 'legend', name: t.badgeLegend, desc: t.badgeLegendDesc, emoji: '👑', requirement: 1000, type: 'minutes' },
@@ -619,7 +642,7 @@ function initDarkMode() {
 
 // ========== SÉLECTION DES JOURS ==========
 function initDaySelectors() {
-    for (let week = 1; week <= 4; week++) {
+    for (let week = 1; week <= 8; week++) {
         setupDaySelector(`daySelector${week}`, week);
     }
     setupDaySelector('daySelectorMaintenance', 'maintenance');
@@ -680,8 +703,8 @@ function updateDayLabels(week, selectedDays) {
 function updateDaySelectorsUI() {
     console.log('🎨 Updating day selector buttons UI...');
 
-    // Update weeks 1-4
-    for (let week = 1; week <= 4; week++) {
+    // Update weeks 1-8
+    for (let week = 1; week <= 8; week++) {
         const selectorId = `daySelector${week}`;
         const selector = document.getElementById(selectorId);
         if (!selector) {
