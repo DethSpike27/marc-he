@@ -138,7 +138,7 @@ const translations = {
         estimatesNote: '* Les calculs sont des estimations basées sur des moyennes',
         weightHelper: 'Utilisé pour calculer les calories brûlées',
         heightHelperCm: 'Ex: 170 cm',
-        heightHelperFt: 'Ex: 5.5 ft (5 pieds 6 pouces) ou 6.0 ft (6 pieds 0 pouces)',
+        heightHelperFt: 'Ex: 5 pieds 6 pouces ou 6 pieds 0 pouces',
 
         // Tips
         tipsTitle: 'Règles d\'Or et Astuces',
@@ -325,7 +325,7 @@ const translations = {
         estimatesNote: '* Calculations are estimates based on averages',
         weightHelper: 'Used to calculate calories burned',
         heightHelperCm: 'Ex: 170 cm',
-        heightHelperFt: 'Ex: 5.5 feet (5 feet 6 inches) or 6.0 feet (6 feet 0 inches)',
+        heightHelperFt: 'Ex: 5 feet 6 inches or 6 feet 0 inches',
 
         // Tips
         tipsTitle: 'Golden Rules and Tips',
@@ -1528,7 +1528,9 @@ function initProfile() {
 
     const saveBtn = document.getElementById('saveProfile');
     const weightInput = document.getElementById('userWeight');
-    const heightInput = document.getElementById('userHeight');
+    const heightCmInput = document.getElementById('userHeightCm');
+    const heightFeetInput = document.getElementById('userHeightFeet');
+    const heightInchesInput = document.getElementById('userHeightInches');
 
     // Mettre à jour les calories quand le poids change
     weightInput.addEventListener('input', () => {
@@ -1536,9 +1538,24 @@ function initProfile() {
         updateBMI();
     });
 
-    heightInput.addEventListener('input', () => {
-        updateBMI();
-    });
+    // Height inputs
+    if (heightCmInput) {
+        heightCmInput.addEventListener('input', () => {
+            updateBMI();
+        });
+    }
+
+    if (heightFeetInput) {
+        heightFeetInput.addEventListener('input', () => {
+            updateBMI();
+        });
+    }
+
+    if (heightInchesInput) {
+        heightInchesInput.addEventListener('input', () => {
+            updateBMI();
+        });
+    }
 
     document.getElementById('weightUnit').addEventListener('change', () => {
         updateCaloriesPerMinute();
@@ -1546,11 +1563,13 @@ function initProfile() {
     });
 
     document.getElementById('heightUnit').addEventListener('change', () => {
+        toggleHeightInputs();
         updateBMI();
         updateHeightHelper();
     });
 
-    // Initialiser le helper
+    // Initialiser le helper et les inputs
+    toggleHeightInputs();
     updateHeightHelper();
 
     saveBtn.addEventListener('click', () => {
@@ -1564,8 +1583,16 @@ function loadUserProfile() {
     document.getElementById('userName').value = profile.name || '';
     document.getElementById('userWeight').value = profile.weight || 250;
     document.getElementById('weightUnit').value = profile.weightUnit || 'lb';
-    document.getElementById('userHeight').value = profile.height || '';
-    document.getElementById('heightUnit').value = profile.heightUnit || 'pi';
+    document.getElementById('heightUnit').value = profile.heightUnit || 'cm';
+
+    // Load height based on unit
+    if (profile.heightUnit === 'ft') {
+        document.getElementById('userHeightFeet').value = profile.heightFeet || '';
+        document.getElementById('userHeightInches').value = profile.heightInches || '';
+    } else {
+        document.getElementById('userHeightCm').value = profile.heightCm || '';
+    }
+
     document.getElementById('userAge').value = profile.age || '';
     document.getElementById('userGoal').value = profile.goal || 'cardio';
 
@@ -1575,6 +1602,7 @@ function loadUserProfile() {
         : (profile.weight || 250);
 
     USER_WEIGHT_LBS = weightInLbs;
+    toggleHeightInputs();
     updateCaloriesPerMinute();
     updateBMI();
     updateGreeting();
@@ -1608,15 +1636,24 @@ function updateGreeting() {
 }
 
 function saveUserProfile() {
+    const heightUnit = document.getElementById('heightUnit').value;
+
     const profile = {
         name: document.getElementById('userName').value,
         weight: parseFloat(document.getElementById('userWeight').value) || 250,
         weightUnit: document.getElementById('weightUnit').value,
-        height: parseFloat(document.getElementById('userHeight').value) || 0,
-        heightUnit: document.getElementById('heightUnit').value,
+        heightUnit: heightUnit,
         age: parseInt(document.getElementById('userAge').value) || 0,
         goal: document.getElementById('userGoal').value
     };
+
+    // Save height based on unit
+    if (heightUnit === 'ft') {
+        profile.heightFeet = parseInt(document.getElementById('userHeightFeet').value) || 0;
+        profile.heightInches = parseInt(document.getElementById('userHeightInches').value) || 0;
+    } else {
+        profile.heightCm = parseFloat(document.getElementById('userHeightCm').value) || 0;
+    }
 
     localStorage.setItem('userProfile', JSON.stringify(profile));
 
@@ -1653,29 +1690,55 @@ function updateCaloriesPerMinute() {
 
 function updateBMI() {
     const weight = parseFloat(document.getElementById('userWeight').value);
-    const height = parseFloat(document.getElementById('userHeight').value);
     const weightUnit = document.getElementById('weightUnit').value;
     const heightUnit = document.getElementById('heightUnit').value;
 
-    if (!weight || !height) {
-        document.getElementById('bmiDisplay').textContent = '--';
-        return;
-    }
-
-    // Convertir en kg et mètres
-    const weightKg = weightUnit === 'lb' ? weight / 2.20462 : weight;
-
-    // Conversion pieds en mètres : 1 pied = 0.3048 mètres
-    // Si height = 5.5 pieds (5 pieds 6 pouces), ça fait 5.5 * 0.3048 = 1.6764 m
     let heightM;
-    if (heightUnit === 'pi') {
-        heightM = height * 0.3048; // Pieds directement en mètres
+
+    if (heightUnit === 'ft') {
+        const feet = parseInt(document.getElementById('userHeightFeet').value) || 0;
+        const inches = parseInt(document.getElementById('userHeightInches').value) || 0;
+
+        if (!weight || (!feet && !inches)) {
+            document.getElementById('bmiDisplay').textContent = '--';
+            return;
+        }
+
+        // Convert feet + inches to meters
+        // 1 foot = 0.3048 meters, 1 inch = 0.0254 meters
+        heightM = (feet * 0.3048) + (inches * 0.0254);
     } else {
-        heightM = height / 100; // cm en mètres
+        const heightCm = parseFloat(document.getElementById('userHeightCm').value);
+
+        if (!weight || !heightCm) {
+            document.getElementById('bmiDisplay').textContent = '--';
+            return;
+        }
+
+        heightM = heightCm / 100; // cm to meters
     }
+
+    // Convert weight to kg
+    const weightKg = weightUnit === 'lb' ? weight / 2.20462 : weight;
 
     const bmi = weightKg / (heightM * heightM);
     document.getElementById('bmiDisplay').textContent = bmi.toFixed(1);
+}
+
+function toggleHeightInputs() {
+    const heightUnit = document.getElementById('heightUnit').value;
+    const cmContainer = document.getElementById('heightCmContainer');
+    const ftContainer = document.getElementById('heightFtContainer');
+
+    if (heightUnit === 'ft') {
+        cmContainer.classList.add('hidden');
+        ftContainer.classList.remove('hidden');
+        ftContainer.classList.add('flex');
+    } else {
+        ftContainer.classList.add('hidden');
+        ftContainer.classList.remove('flex');
+        cmContainer.classList.remove('hidden');
+    }
 }
 
 function updateHeightHelper() {
@@ -1683,7 +1746,7 @@ function updateHeightHelper() {
     const helper = document.getElementById('heightHelper');
     const t = translations[currentLanguage];
 
-    if (heightUnit === 'pi') {
+    if (heightUnit === 'ft') {
         helper.textContent = t.heightHelperFt;
     } else {
         helper.textContent = t.heightHelperCm;

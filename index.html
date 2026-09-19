@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+84<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -954,13 +954,29 @@
                             Taille
                         </label>
                         <div class="flex gap-3">
-                            <input type="number" id="userHeight" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="5.5" min="3" max="8" step="0.1">
+                            <!-- Mode cm (single input) -->
+                            <div id="heightCmContainer" class="flex-1 flex gap-3">
+                                <input type="number" id="userHeightCm" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="170" min="100" max="250">
+                            </div>
+                            <!-- Mode ft (two inputs) -->
+                            <div id="heightFtContainer" class="flex-1 gap-2 hidden">
+                                <div class="flex gap-2">
+                                    <div class="flex-1">
+                                        <input type="number" id="userHeightFeet" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="5" min="3" max="8">
+                                        <p class="text-xs text-gray-500 mt-1 text-center">ft</p>
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="number" id="userHeightInches" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="6" min="0" max="11">
+                                        <p class="text-xs text-gray-500 mt-1 text-center">in</p>
+                                    </div>
+                                </div>
+                            </div>
                             <select id="heightUnit" class="px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition">
-                                <option value="pi">ft</option>
                                 <option value="cm">cm</option>
+                                <option value="ft">ft</option>
                             </select>
                         </div>
-                        <p class="text-xs text-gray-600 mt-1" id="heightHelper">Ex: 170 cm ou 5.5 ft (5 pieds 6 pouces)</p>
+                        <p class="text-xs text-gray-600 mt-1" id="heightHelper">Ex: 170 cm</p>
                     </div>
 
                     <!-- Âge -->
