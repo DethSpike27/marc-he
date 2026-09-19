@@ -20,6 +20,7 @@ const translations = {
         tabTips: '💡 Conseils',
 
         // Buttons
+        btnRefresh: '🔄 Rafraîchir',
         btnReset: '🔄 Recommencer',
         btnExport: '📥 Exporter',
         btnLogin: 'Se connecter',
@@ -186,6 +187,7 @@ const translations = {
         tabTips: '💡 Tips',
 
         // Buttons
+        btnRefresh: '🔄 Refresh',
         btnReset: '🔄 Reset',
         btnExport: '📥 Export',
         btnLogin: 'Sign In',
@@ -732,8 +734,17 @@ function updateDaySelectorsUI() {
 function initCheckboxes() {
     const checkboxes = document.querySelectorAll('.checkbox-custom:not(.maintenance-checkbox)');
     const maintenanceCheckboxes = document.querySelectorAll('.maintenance-checkbox');
+    const refreshBtn = document.getElementById('refreshBtn');
     const resetBtn = document.getElementById('resetBtn');
     const newWeekBtn = document.getElementById('newWeekBtn');
+
+    // Refresh button - reload the page
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            console.log('🔄 Refreshing page...');
+            location.reload(true); // Force reload, bypass cache
+        });
+    }
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
