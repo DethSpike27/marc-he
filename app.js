@@ -69,6 +69,13 @@ const translations = {
         dayV: 'Vendredi',
         dayS: 'Samedi',
         dayD: 'Dimanche',
+        dayHeaderL: 'L',
+        dayHeaderM: 'M',
+        dayHeaderM2: 'M',
+        dayHeaderJ: 'J',
+        dayHeaderV: 'V',
+        dayHeaderS: 'S',
+        dayHeaderD: 'D',
 
         // Session
         session: 'Séance',
@@ -182,7 +189,9 @@ const translations = {
         maintenanceDesc: '30 minutes - 3× par semaine',
         exampleName: 'Ex: Marc',
         exampleAge: 'Ex: 35',
-        champion: 'Champion'
+        champion: 'Champion',
+        btnClearToday: '🗑️ Effacer aujourd\'hui',
+        btnClearAllHistory: '🗑️ Effacer tout l\'historique'
     },
     en: {
         // Header
@@ -247,6 +256,13 @@ const translations = {
         dayV: 'Friday',
         dayS: 'Saturday',
         dayD: 'Sunday',
+        dayHeaderL: 'M',
+        dayHeaderM: 'T',
+        dayHeaderM2: 'W',
+        dayHeaderJ: 'T',
+        dayHeaderV: 'F',
+        dayHeaderS: 'S',
+        dayHeaderD: 'S',
 
         // Session
         session: 'Session',
@@ -360,7 +376,9 @@ const translations = {
         maintenanceDesc: '30 minutes - 3× per week',
         exampleName: 'Ex: John',
         exampleAge: 'Ex: 35',
-        champion: 'Champion'
+        champion: 'Champion',
+        btnClearToday: '🗑️ Clear today',
+        btnClearAllHistory: '🗑️ Clear all history'
     }
 };
 
@@ -439,6 +457,22 @@ function updateLanguage() {
             } else {
                 el.textContent = t[key];
             }
+        }
+    });
+
+    // Update day headers in calendar
+    document.querySelectorAll('[data-i18n-day]').forEach(el => {
+        const key = el.dataset.i18nDay;
+        if (t[key]) {
+            el.textContent = t[key];
+        }
+    });
+
+    // Update select options
+    document.querySelectorAll('option[data-i18n]').forEach(option => {
+        const key = option.dataset.i18n;
+        if (t[key]) {
+            option.textContent = t[key];
         }
     });
 
@@ -1719,6 +1753,8 @@ function initFirebase() {
         if (user) {
             const firstName = (user.displayName || '').split(' ')[0] || 'User';
             console.log('👤 Setting button text to:', firstName);
+            // Force text update, removing data-i18n attribute to prevent override
+            authBtnText.removeAttribute('data-i18n');
             authBtnText.textContent = firstName;
             authBtn.title = user.email;
             authBtn.onclick = () => {
@@ -1728,6 +1764,8 @@ function initFirebase() {
             };
             document.getElementById('syncLabel').style.display = 'inline';
         } else {
+            // Re-add data-i18n when logged out
+            authBtnText.setAttribute('data-i18n', 'btnLogin');
             authBtnText.textContent = t.btnLogin;
             const tooltipText = currentLanguage === 'fr' ? 'Se connecter avec Google pour synchroniser' : 'Sign in with Google to sync';
             authBtn.title = tooltipText;
