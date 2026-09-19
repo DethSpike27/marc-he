@@ -1351,6 +1351,21 @@ function initFirebase() {
     const authBtn = document.getElementById('authBtn');
     const authBtnText = document.getElementById('authBtnText');
 
+    // Check for redirect result on page load (mobile flow)
+    firebase.auth().getRedirectResult()
+        .then((result) => {
+            if (result.user) {
+                console.log('✅ Logged in via redirect:', result.user.email);
+            }
+        })
+        .catch((error) => {
+            console.error('Redirect error:', error);
+            if (error.code !== 'auth/popup-closed-by-user') {
+                const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
+                alert(errorMsg + error.message);
+            }
+        });
+
     function updateAuthUI(user) {
         const t = translations[currentLanguage];
         if (user) {
@@ -1373,13 +1388,23 @@ function initFirebase() {
                 provider.setCustomParameters({
                     prompt: 'select_account'
                 });
-                firebase.auth().signInWithPopup(provider)
-                    .catch(err => {
-                        if (err.code !== 'auth/popup-closed-by-user') {
-                            const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
-                            alert(errorMsg + err.message);
-                        }
-                    });
+
+                // Detect if mobile - use redirect instead of popup
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                if (isMobile) {
+                    console.log('📱 Mobile detected - using redirect');
+                    firebase.auth().signInWithRedirect(provider);
+                } else {
+                    console.log('💻 Desktop detected - using popup');
+                    firebase.auth().signInWithPopup(provider)
+                        .catch(err => {
+                            if (err.code !== 'auth/popup-closed-by-user') {
+                                const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
+                                alert(errorMsg + err.message);
+                            }
+                        });
+                }
             };
             document.getElementById('syncLabel').style.display = 'none';
         }
