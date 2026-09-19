@@ -1368,7 +1368,12 @@ function initFirebase() {
             const tooltipText = currentLanguage === 'fr' ? 'Se connecter avec Google pour synchroniser' : 'Sign in with Google to sync';
             authBtn.title = tooltipText;
             authBtn.onclick = () => {
-                firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
+                const provider = new firebase.auth.GoogleAuthProvider();
+                // Force account selection every time
+                provider.setCustomParameters({
+                    prompt: 'select_account'
+                });
+                firebase.auth().signInWithPopup(provider)
                     .catch(err => {
                         if (err.code !== 'auth/popup-closed-by-user') {
                             const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
