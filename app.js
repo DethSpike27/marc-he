@@ -748,6 +748,7 @@ function loadProgress() {
 function saveCheckbox(checkbox) {
     const key = getCheckboxKey(checkbox);
     localStorage.setItem(key, checkbox.checked);
+    console.log('📝 Checkbox saved:', key, '=', checkbox.checked);
 
     if (checkbox.checked) {
         const date = new Date().toISOString().split('T')[0];
@@ -756,6 +757,7 @@ function saveCheckbox(checkbox) {
     }
 
     // Sync Firebase
+    console.log('📤 Triggering Firebase sync from checkbox...');
     saveToFirebase();
 }
 
@@ -1333,6 +1335,7 @@ function checkFirstTimeUser() {
 
 // ========== FIREBASE SYNC ==========
 function initFirebase() {
+    console.log('🔥 Initializing Firebase...');
     const authBtn = document.getElementById('authBtn');
     const authBtnText = document.getElementById('authBtnText');
 
@@ -1366,10 +1369,12 @@ function initFirebase() {
     }
 
     firebase.auth().onAuthStateChanged(user => {
+        console.log('🔐 Firebase Auth State Changed:', user ? `Logged in as ${user.email}` : 'Not logged in');
         fbCurrentUser = user;
         updateAuthUI(user);
 
         if (!user) {
+            console.log('❌ User not logged in - Firebase sync disabled');
             if (fbUserRef) {
                 fbUserRef.off();
                 fbUserRef = null;
@@ -1377,24 +1382,36 @@ function initFirebase() {
             return;
         }
 
+        console.log('✅ User logged in - Setting up Firebase sync for UID:', user.uid);
+
         // Référence Firebase pour cet utilisateur
         fbUserRef = firebase.database().ref(`walking-program/${user.uid}`);
         fbSyncingCount = 0;
 
         // Écouter les changements depuis Firebase
         fbUserRef.on('value', snapshot => {
-            if (fbSyncingCount > 0) return; // Ignore nos propres sauvegardes
-
             const data = snapshot.val();
+            console.log('📥 Firebase data received:', data ? 'Data exists' : 'No data');
+
             if (data && data.lastModified) {
                 updateSyncIndicator(data.lastModified);
+            }
+
+            // Skip if this is our own save (but only briefly)
+            if (fbSyncingCount > 0) {
+                console.log('⏭️ Skipping update (own save in progress)');
+                return;
             }
 
             const hasRemote = !!(data && data.profile !== undefined);
             const hasLocal = !!(localStorage.getItem('userProfile'));
 
-            if (!hasRemote && !hasLocal) return;
+            if (!hasRemote && !hasLocal) {
+                console.log('⚠️ No remote or local data');
+                return;
+            }
 
+            console.log('🔄 Syncing data from Firebase...');
             let needsPush = false;
 
             if (hasRemote) {
@@ -1449,15 +1466,32 @@ function initFirebase() {
                         : '<span class="text-xl sm:text-2xl">🌙</span>';
                 }
 
+                if (data.language !== undefined) {
+                    const oldLanguage = currentLanguage;
+                    currentLanguage = data.language;
+                    localStorage.setItem('language', data.language);
+                    const selector = document.getElementById('languageSelector');
+                    if (selector) selector.value = data.language;
+                    if (oldLanguage !== data.language) {
+                        updateLanguage();
+                    }
+                }
+
+                console.log('🔄 Updating UI with synced data...');
                 loadProgress();
                 updateProgress();
                 renderBadges();
                 renderCalendar();
                 updateStats();
+                console.log('✅ UI updated!');
 
-                if (needsPush) saveToFirebase();
+                if (needsPush) {
+                    console.log('📤 Pushing local changes to Firebase...');
+                    saveToFirebase();
+                }
             } else {
                 // Pas de données Firebase, envoyer les locales
+                console.log('📤 No remote data - sending local data to Firebase...');
                 saveToFirebase();
             }
         }, err => {
@@ -1487,8 +1521,12 @@ function updateSyncIndicator(isoDate) {
 }
 
 function saveToFirebase() {
-    if (!fbCurrentUser || !fbUserRef) return;
+    if (!fbCurrentUser || !fbUserRef) {
+        console.log('Firebase sync skipped: user not logged in');
+        return;
+    }
 
+    console.log('Saving to Firebase...');
     fbSyncingCount++;
     const nowIso = new Date().toISOString();
 
@@ -1516,7 +1554,7 @@ function saveToFirebase() {
         }
     }
 
-    fbUserRef.set({
+    const dataToSave = {
         profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
         sessions: sessions,
         days: days,
@@ -1524,15 +1562,30 @@ function saveToFirebase() {
         badges: getUnlockedBadges(),
         notes: notes,
         darkMode: localStorage.getItem('darkMode') || 'false',
+        language: localStorage.getItem('language') || 'fr',
         lastModified: nowIso
-    })
+    };
+
+    console.log('Data to save:', dataToSave);
+    console.log('fbSyncingCount before save:', fbSyncingCount);
+
+    fbUserRef.set(dataToSave)
     .then(() => {
-        fbSyncingCount--;
+        console.log('✅ Firebase sync successful!');
         updateSyncIndicator(nowIso);
+        // Reset counter after a brief delay to allow other listeners to settle
+        setTimeout(() => {
+            fbSyncingCount--;
+            console.log('fbSyncingCount after save:', fbSyncingCount);
+        }, 100);
     })
     .catch(err => {
         fbSyncingCount--;
-        console.error('Firebase save error:', err);
-        alert('Erreur de synchronisation : ' + err.message);
+        console.error('❌ Firebase save error:', err);
+        console.log('fbSyncingCount after error:', fbSyncingCount);
+        const errorMsg = currentLanguage === 'fr'
+            ? `Erreur de synchronisation : ${err.message}`
+            : `Sync error: ${err.message}`;
+        alert(errorMsg);
     });
 }
