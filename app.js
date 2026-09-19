@@ -651,8 +651,11 @@ function setupDaySelector(selectorId, week) {
 
             const selected = Array.from(selector.querySelectorAll('.day-selector.selected'))
                 .map(b => b.dataset.day);
-            localStorage.setItem(`${week}_days`, JSON.stringify(selected));
+            const key = `${week}_days`;
+            console.log(`📅 Day selection changed for ${key}:`, selected);
+            localStorage.setItem(key, JSON.stringify(selected));
             updateDayLabels(week, selected);
+            console.log('📤 Triggering Firebase sync from day selector...');
             saveToFirebase();
         });
     });
@@ -677,9 +680,14 @@ function updateDaySelectorsUI() {
     for (let week = 1; week <= 4; week++) {
         const selectorId = `daySelector${week}`;
         const selector = document.getElementById(selectorId);
-        if (!selector) continue;
+        if (!selector) {
+            console.log(`  ⚠️ Selector ${selectorId} not found`);
+            continue;
+        }
 
-        const savedDays = JSON.parse(localStorage.getItem(`${week}_days`) || '[]');
+        const key = `${week}_days`;
+        const savedDays = JSON.parse(localStorage.getItem(key) || '[]');
+        console.log(`  📅 Week ${week} days from localStorage:`, savedDays);
         const buttons = selector.querySelectorAll('.day-selector');
 
         // Remove all selections first
@@ -688,7 +696,10 @@ function updateDaySelectorsUI() {
         // Add selections from saved data
         savedDays.forEach(day => {
             const btn = Array.from(buttons).find(b => b.dataset.day === day);
-            if (btn) btn.classList.add('selected');
+            if (btn) {
+                btn.classList.add('selected');
+                console.log(`    ✅ Selected day ${day} for week ${week}`);
+            }
         });
 
         // Update labels
@@ -699,12 +710,16 @@ function updateDaySelectorsUI() {
     const maintenanceSelector = document.getElementById('daySelectorMaintenance');
     if (maintenanceSelector) {
         const savedDays = JSON.parse(localStorage.getItem('maintenance_days') || '[]');
+        console.log(`  📅 Maintenance days from localStorage:`, savedDays);
         const buttons = maintenanceSelector.querySelectorAll('.day-selector');
 
         buttons.forEach(btn => btn.classList.remove('selected'));
         savedDays.forEach(day => {
             const btn = Array.from(buttons).find(b => b.dataset.day === day);
-            if (btn) btn.classList.add('selected');
+            if (btn) {
+                btn.classList.add('selected');
+                console.log(`    ✅ Selected day ${day} for maintenance`);
+            }
         });
 
         updateDayLabels('maintenance', savedDays);
@@ -722,11 +737,10 @@ function initCheckboxes() {
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
-            saveCheckbox(checkbox);
+            saveCheckbox(checkbox); // This now handles calendar update
             updateProgress();
             checkBadges();
             updateStats();
-            renderCalendar();
 
             const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
             if (checkedCount === 24) {
@@ -805,10 +819,15 @@ function saveCheckbox(checkbox) {
     localStorage.setItem(key, checkbox.checked);
     console.log('📝 Checkbox saved:', key, '=', checkbox.checked);
 
+    const date = new Date().toISOString().split('T')[0];
+    const duration = parseInt(checkbox.dataset.duration) || 30;
+
     if (checkbox.checked) {
-        const date = new Date().toISOString().split('T')[0];
-        const duration = parseInt(checkbox.dataset.duration) || 30;
+        // Add to history when checked
         saveSessionToHistory(date, duration);
+    } else {
+        // Remove from history when unchecked
+        removeSessionFromHistory(date);
     }
 
     // Sync Firebase
@@ -843,6 +862,18 @@ function saveSessionToHistory(date, duration) {
     if (!history[date]) {
         history[date] = { duration, date };
         localStorage.setItem('sessionHistory', JSON.stringify(history));
+        console.log('📅 Added to history:', date);
+        saveToFirebase();
+    }
+}
+
+function removeSessionFromHistory(date) {
+    const history = JSON.parse(localStorage.getItem('sessionHistory') || '{}');
+    if (history[date]) {
+        delete history[date];
+        localStorage.setItem('sessionHistory', JSON.stringify(history));
+        console.log('🗑️ Removed from history:', date);
+        renderCalendar(); // Update calendar immediately
         saveToFirebase();
     }
 }
