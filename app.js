@@ -1527,6 +1527,15 @@ function initFirebase() {
     const authBtn = document.getElementById('authBtn');
     const authBtnText = document.getElementById('authBtnText');
 
+    // Set persistence to LOCAL (survives browser restarts, especially important for Safari)
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            console.log('✅ Auth persistence set to LOCAL');
+        })
+        .catch((error) => {
+            console.error('❌ Persistence error:', error);
+        });
+
     // Check for redirect result on page load (mobile flow)
     console.log('🔄 Checking for redirect result...');
     firebase.auth().getRedirectResult()
@@ -1594,6 +1603,14 @@ function initFirebase() {
             };
             document.getElementById('syncLabel').style.display = 'none';
         }
+    }
+
+    // Also check current user immediately (Safari fix)
+    const currentUser = firebase.auth().currentUser;
+    if (currentUser) {
+        console.log('✅ User already logged in:', currentUser.email);
+        fbCurrentUser = currentUser;
+        updateAuthUI(currentUser);
     }
 
     firebase.auth().onAuthStateChanged(user => {
