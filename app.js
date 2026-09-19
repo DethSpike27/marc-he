@@ -1399,10 +1399,9 @@ function updateGreeting() {
     const t = translations[currentLanguage];
 
     if (profile.name) {
-        const appName = currentLanguage === 'fr' ? 'Marc-he' : 'Walk-On';
-        greetingEl.textContent = currentLanguage === 'fr' ? `${appName} de ${profile.name}` : `${profile.name}'s ${appName}`;
+        greetingEl.textContent = `Marc-he / ${profile.name}`;
     } else {
-        greetingEl.textContent = t.appTitle;
+        greetingEl.textContent = 'Marc-he'; // Always Marc-he, even in English
     }
 
     const goalTexts = {
