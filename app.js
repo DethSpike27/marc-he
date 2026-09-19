@@ -670,6 +670,49 @@ function updateDayLabels(week, selectedDays) {
     }
 }
 
+function updateDaySelectorsUI() {
+    console.log('🎨 Updating day selector buttons UI...');
+
+    // Update weeks 1-4
+    for (let week = 1; week <= 4; week++) {
+        const selectorId = `daySelector${week}`;
+        const selector = document.getElementById(selectorId);
+        if (!selector) continue;
+
+        const savedDays = JSON.parse(localStorage.getItem(`${week}_days`) || '[]');
+        const buttons = selector.querySelectorAll('.day-selector');
+
+        // Remove all selections first
+        buttons.forEach(btn => btn.classList.remove('selected'));
+
+        // Add selections from saved data
+        savedDays.forEach(day => {
+            const btn = Array.from(buttons).find(b => b.dataset.day === day);
+            if (btn) btn.classList.add('selected');
+        });
+
+        // Update labels
+        updateDayLabels(week, savedDays);
+    }
+
+    // Update maintenance
+    const maintenanceSelector = document.getElementById('daySelectorMaintenance');
+    if (maintenanceSelector) {
+        const savedDays = JSON.parse(localStorage.getItem('maintenance_days') || '[]');
+        const buttons = maintenanceSelector.querySelectorAll('.day-selector');
+
+        buttons.forEach(btn => btn.classList.remove('selected'));
+        savedDays.forEach(day => {
+            const btn = Array.from(buttons).find(b => b.dataset.day === day);
+            if (btn) btn.classList.add('selected');
+        });
+
+        updateDayLabels('maintenance', savedDays);
+    }
+
+    console.log('✅ Day selectors UI updated!');
+}
+
 // ========== GESTION DES CHECKBOXES ==========
 function initCheckboxes() {
     const checkboxes = document.querySelectorAll('.checkbox-custom:not(.maintenance-checkbox)');
@@ -1459,8 +1502,10 @@ function initFirebase() {
             if (hasRemote) {
                 // Merge des données
                 if (data.profile) {
+                    console.log('🔄 Syncing profile from Firebase...');
                     const localProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-                    const mergedProfile = Object.assign({}, data.profile, localProfile);
+                    // Remote wins - take Firebase profile, but keep local values if not in remote
+                    const mergedProfile = Object.assign({}, localProfile, data.profile);
                     localStorage.setItem('userProfile', JSON.stringify(mergedProfile));
                     loadUserProfile();
                 }
@@ -1495,8 +1540,11 @@ function initFirebase() {
                     Object.keys(data.days).forEach(key => {
                         if (data.days[key]) {
                             localStorage.setItem(key, data.days[key]);
+                            console.log(`  📅 Updated ${key}:`, data.days[key]);
                         }
                     });
+                    // Update visual day selectors
+                    updateDaySelectorsUI();
                 }
 
                 if (data.history) {
@@ -1513,9 +1561,15 @@ function initFirebase() {
                 }
 
                 if (data.notes) {
+                    console.log('🔄 Syncing notes from Firebase...');
                     Object.keys(data.notes).forEach(key => {
-                        if (!localStorage.getItem(key)) {
-                            localStorage.setItem(key, data.notes[key]);
+                        const remoteNote = data.notes[key];
+                        const localNote = localStorage.getItem(key);
+
+                        // Remote wins (most recent save)
+                        if (localNote !== remoteNote) {
+                            console.log(`  📝 Updated note ${key}`);
+                            localStorage.setItem(key, remoteNote);
                         }
                     });
                 }
