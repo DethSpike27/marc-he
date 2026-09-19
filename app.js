@@ -1526,19 +1526,6 @@ function initFirebase() {
     console.log('🔥 Initializing Firebase...');
     const authBtn = document.getElementById('authBtn');
     const authBtnText = document.getElementById('authBtnText');
-    const debugAuthBtn = document.getElementById('debugAuthBtn');
-
-    // Debug button to check auth state
-    if (debugAuthBtn) {
-        debugAuthBtn.addEventListener('click', () => {
-            const user = firebase.auth().currentUser;
-            const msg = user
-                ? `✅ Connecté !\n\nEmail: ${user.email}\nNom: ${user.displayName}\nUID: ${user.uid}`
-                : '❌ Non connecté';
-            alert(msg);
-            console.log('Debug - Current user:', user);
-        });
-    }
 
     // Set persistence to LOCAL (survives browser restarts, especially important for Safari)
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
