@@ -819,15 +819,20 @@ function saveCheckbox(checkbox) {
     localStorage.setItem(key, checkbox.checked);
     console.log('📝 Checkbox saved:', key, '=', checkbox.checked);
 
-    const date = new Date().toISOString().split('T')[0];
     const duration = parseInt(checkbox.dataset.duration) || 30;
 
     if (checkbox.checked) {
-        // Add to history when checked
-        saveSessionToHistory(date, duration);
+        // Save when this session was completed
+        const date = new Date().toISOString().split('T')[0];
+        localStorage.setItem(`${key}_date`, date);
+        saveSessionToHistory(date, duration, key);
     } else {
-        // Remove from history when unchecked
-        removeSessionFromHistory(date);
+        // Remove from history using the saved date for this session
+        const savedDate = localStorage.getItem(`${key}_date`);
+        if (savedDate) {
+            removeSessionFromHistory(savedDate, key);
+            localStorage.removeItem(`${key}_date`);
+        }
     }
 
     // Sync Firebase
@@ -857,24 +862,43 @@ function updateProgress() {
 }
 
 // ========== HISTORIQUE DES SÉANCES ==========
-function saveSessionToHistory(date, duration) {
+function saveSessionToHistory(date, duration, sessionKey) {
     const history = JSON.parse(localStorage.getItem('sessionHistory') || '{}');
+
+    // Store multiple sessions per day
     if (!history[date]) {
-        history[date] = { duration, date };
-        localStorage.setItem('sessionHistory', JSON.stringify(history));
-        console.log('📅 Added to history:', date);
-        saveToFirebase();
+        history[date] = { duration, date, sessions: [] };
     }
+
+    // Add this session if not already there
+    if (!history[date].sessions.includes(sessionKey)) {
+        history[date].sessions.push(sessionKey);
+        console.log('📅 Added session to history:', sessionKey, 'on', date);
+    }
+
+    localStorage.setItem('sessionHistory', JSON.stringify(history));
+    renderCalendar(); // Update calendar immediately
 }
 
-function removeSessionFromHistory(date) {
+function removeSessionFromHistory(date, sessionKey) {
     const history = JSON.parse(localStorage.getItem('sessionHistory') || '{}');
-    if (history[date]) {
-        delete history[date];
-        localStorage.setItem('sessionHistory', JSON.stringify(history));
-        console.log('🗑️ Removed from history:', date);
-        renderCalendar(); // Update calendar immediately
-        saveToFirebase();
+
+    if (history[date] && history[date].sessions) {
+        // Remove this specific session
+        const index = history[date].sessions.indexOf(sessionKey);
+        if (index > -1) {
+            history[date].sessions.splice(index, 1);
+            console.log('🗑️ Removed session from history:', sessionKey, 'from', date);
+
+            // If no more sessions on this day, remove the date entirely
+            if (history[date].sessions.length === 0) {
+                delete history[date];
+                console.log('🗑️ Removed date from history (no more sessions):', date);
+            }
+
+            localStorage.setItem('sessionHistory', JSON.stringify(history));
+            renderCalendar(); // Update calendar immediately
+        }
     }
 }
 
@@ -1554,6 +1578,15 @@ function initFirebase() {
                         }
                     });
 
+                    // Also load session dates
+                    if (data.sessionDates) {
+                        console.log('🔄 Loading session dates from Firebase...');
+                        Object.keys(data.sessionDates).forEach(key => {
+                            localStorage.setItem(`${key}_date`, data.sessionDates[key]);
+                            console.log(`  📅 Session ${key} was completed on ${data.sessionDates[key]}`);
+                        });
+                    }
+
                     // Check if local has sessions not in remote (need to push)
                     const allCheckboxes = document.querySelectorAll('.checkbox-custom');
                     allCheckboxes.forEach(checkbox => {
@@ -1682,12 +1715,19 @@ function saveToFirebase() {
     console.log('Saving to Firebase...');
     const nowIso = new Date().toISOString();
 
-    // Collecter toutes les sessions
+    // Collecter toutes les sessions et leurs dates
     const sessions = {};
+    const sessionDates = {};
     const checkboxes = document.querySelectorAll('.checkbox-custom');
     checkboxes.forEach(cb => {
         const key = getCheckboxKey(cb);
         sessions[key] = String(cb.checked);
+
+        // Also save the date when this session was completed
+        const savedDate = localStorage.getItem(`${key}_date`);
+        if (savedDate) {
+            sessionDates[key] = savedDate;
+        }
     });
 
     // Collecter les sélections de jours
@@ -1709,6 +1749,7 @@ function saveToFirebase() {
     const dataToSave = {
         profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
         sessions: sessions,
+        sessionDates: sessionDates,
         days: days,
         history: getSessionHistory(),
         badges: getUnlockedBadges(),
