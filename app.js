@@ -22,7 +22,8 @@ const translations = {
         // Buttons
         btnRefresh: '🔄 Rafraîchir',
         btnReset: '🔄 Recommencer',
-        btnExport: '📥 Exporter',
+        btnExport: '📤 Exporter',
+        btnImport: '📥 Importer',
         btnLogin: 'Se connecter',
         btnLogout: 'Se déconnecter',
 
@@ -189,7 +190,8 @@ const translations = {
         // Buttons
         btnRefresh: '🔄 Refresh',
         btnReset: '🔄 Reset',
-        btnExport: '📥 Export',
+        btnExport: '📤 Export',
+        btnImport: '📥 Import',
         btnLogin: 'Sign In',
         btnLogout: 'Sign Out',
 
@@ -1268,13 +1270,28 @@ function initNotes() {
     });
 }
 
-// ========== EXPORT ==========
+// ========== EXPORT / IMPORT ==========
 function initExport() {
     const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
 
     exportBtn.addEventListener('click', () => {
         const data = getAllData();
         downloadJSON(data);
+    });
+
+    importBtn.addEventListener('click', () => {
+        importFile.click();
+    });
+
+    importFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            importJSON(file);
+        }
+        // Reset input so same file can be imported again
+        e.target.value = '';
     });
 }
 
@@ -1330,6 +1347,109 @@ function downloadJSON(data) {
     a.download = `marche-progression-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+function importJSON(file) {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            console.log('📥 Importing data:', data);
+
+            // Confirm before importing
+            const confirmMsg = currentLanguage === 'fr'
+                ? `⚠️ Importer ces données ?\n\nCela va REMPLACER toutes vos données actuelles.\n\nFichier: ${file.name}\nDate d'export: ${data.exportDate ? new Date(data.exportDate).toLocaleDateString() : 'inconnue'}\n\nContinuer ?`
+                : `⚠️ Import this data?\n\nThis will REPLACE all your current data.\n\nFile: ${file.name}\nExport date: ${data.exportDate ? new Date(data.exportDate).toLocaleDateString() : 'unknown'}\n\nContinue?`;
+
+            if (!confirm(confirmMsg)) {
+                console.log('❌ Import cancelled by user');
+                return;
+            }
+
+            // Restore profile
+            if (data.profile) {
+                localStorage.setItem('userProfile', JSON.stringify(data.profile));
+            }
+
+            // Restore sessions
+            if (data.sessions) {
+                Object.keys(data.sessions).forEach(key => {
+                    localStorage.setItem(key, data.sessions[key]);
+                });
+            }
+
+            // Restore session dates
+            if (data.sessionDates) {
+                Object.keys(data.sessionDates).forEach(key => {
+                    localStorage.setItem(`${key}_date`, data.sessionDates[key]);
+                });
+            }
+
+            // Restore history
+            if (data.history) {
+                localStorage.setItem('sessionHistory', JSON.stringify(data.history));
+            }
+
+            // Restore badges
+            if (data.badges) {
+                localStorage.setItem('unlockedBadges', JSON.stringify(data.badges));
+            }
+
+            // Restore notes
+            if (data.notes) {
+                Object.keys(data.notes).forEach(key => {
+                    localStorage.setItem(key, data.notes[key]);
+                });
+            }
+
+            // Restore settings
+            if (data.settings) {
+                if (data.settings.darkMode) {
+                    localStorage.setItem('darkMode', data.settings.darkMode);
+                }
+                if (data.settings.days) {
+                    Object.keys(data.settings.days).forEach(key => {
+                        if (data.settings.days[key]) {
+                            localStorage.setItem(key, data.settings.days[key]);
+                        }
+                    });
+                }
+            }
+
+            console.log('✅ Data imported successfully');
+
+            // Sync to Firebase
+            saveToFirebase();
+
+            // Success message and reload
+            const successMsg = currentLanguage === 'fr'
+                ? '✅ Importation réussie !\n\nLa page va se recharger pour appliquer les changements.'
+                : '✅ Import successful!\n\nThe page will reload to apply changes.';
+            alert(successMsg);
+
+            // Reload page to show imported data
+            setTimeout(() => {
+                location.reload();
+            }, 500);
+
+        } catch (error) {
+            console.error('❌ Import error:', error);
+            const errorMsg = currentLanguage === 'fr'
+                ? `❌ Erreur d'importation !\n\nLe fichier n'est pas valide.\n\nDétails: ${error.message}`
+                : `❌ Import error!\n\nThe file is not valid.\n\nDetails: ${error.message}`;
+            alert(errorMsg);
+        }
+    };
+
+    reader.onerror = () => {
+        const errorMsg = currentLanguage === 'fr'
+            ? '❌ Impossible de lire le fichier.'
+            : '❌ Unable to read file.';
+        alert(errorMsg);
+    };
+
+    reader.readAsText(file);
 }
 
 // ========== NOTIFICATIONS ==========
