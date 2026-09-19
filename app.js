@@ -1526,6 +1526,19 @@ function initFirebase() {
     console.log('🔥 Initializing Firebase...');
     const authBtn = document.getElementById('authBtn');
     const authBtnText = document.getElementById('authBtnText');
+    const debugAuthBtn = document.getElementById('debugAuthBtn');
+
+    // Debug button to check auth state
+    if (debugAuthBtn) {
+        debugAuthBtn.addEventListener('click', () => {
+            const user = firebase.auth().currentUser;
+            const msg = user
+                ? `✅ Connecté !\n\nEmail: ${user.email}\nNom: ${user.displayName}\nUID: ${user.uid}`
+                : '❌ Non connecté';
+            alert(msg);
+            console.log('Debug - Current user:', user);
+        });
+    }
 
     // Set persistence to LOCAL (survives browser restarts, especially important for Safari)
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -1584,22 +1597,24 @@ function initFirebase() {
                     prompt: 'select_account'
                 });
 
-                // Detect if mobile - use redirect instead of popup
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                // Try popup first (works better on iOS Safari)
+                console.log('🔐 Attempting sign in with popup...');
+                firebase.auth().signInWithPopup(provider)
+                    .then((result) => {
+                        console.log('✅ Popup login successful:', result.user.email);
+                    })
+                    .catch(err => {
+                        console.error('❌ Popup error:', err.code, err.message);
 
-                if (isMobile) {
-                    console.log('📱 Mobile detected - using redirect');
-                    firebase.auth().signInWithRedirect(provider);
-                } else {
-                    console.log('💻 Desktop detected - using popup');
-                    firebase.auth().signInWithPopup(provider)
-                        .catch(err => {
-                            if (err.code !== 'auth/popup-closed-by-user') {
-                                const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
-                                alert(errorMsg + err.message);
-                            }
-                        });
-                }
+                        // If popup blocked or fails, fallback to redirect
+                        if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
+                            console.log('⚠️ Popup blocked/closed - trying redirect...');
+                            firebase.auth().signInWithRedirect(provider);
+                        } else {
+                            const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
+                            alert(errorMsg + err.message);
+                        }
+                    });
             };
             document.getElementById('syncLabel').style.display = 'none';
         }
