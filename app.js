@@ -1528,14 +1528,21 @@ function initFirebase() {
     const authBtnText = document.getElementById('authBtnText');
 
     // Check for redirect result on page load (mobile flow)
+    console.log('🔄 Checking for redirect result...');
     firebase.auth().getRedirectResult()
         .then((result) => {
             if (result.user) {
                 console.log('✅ Logged in via redirect:', result.user.email);
+                // Force UI update after redirect
+                setTimeout(() => {
+                    updateAuthUI(result.user);
+                }, 500);
+            } else {
+                console.log('ℹ️ No redirect result (normal on initial load)');
             }
         })
         .catch((error) => {
-            console.error('Redirect error:', error);
+            console.error('❌ Redirect error:', error);
             if (error.code !== 'auth/popup-closed-by-user') {
                 const errorMsg = currentLanguage === 'fr' ? 'Erreur de connexion : ' : 'Connection error: ';
                 alert(errorMsg + error.message);
@@ -1544,8 +1551,11 @@ function initFirebase() {
 
     function updateAuthUI(user) {
         const t = translations[currentLanguage];
+        console.log('🎨 Updating auth UI for user:', user ? user.email : 'none');
+
         if (user) {
             const firstName = (user.displayName || '').split(' ')[0] || 'User';
+            console.log('👤 Setting button text to:', firstName);
             authBtnText.textContent = firstName;
             authBtn.title = user.email;
             authBtn.onclick = () => {
