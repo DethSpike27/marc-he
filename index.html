@@ -23,25 +23,44 @@
         });
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
         * {
             -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition-duration: 0.2s;
+            transition-timing-function: ease-out;
+        }
+        h1, h2, h3, .font-bold {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
             min-height: 100vh;
             background-attachment: fixed;
             transition: background 0.3s ease;
+            padding: 1rem;
         }
         body.dark-mode {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #1a0f0a 0%, #2d1b1b 100%);
         }
         .glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            transition: background 0.3s ease;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(249, 115, 22, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        .glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(249, 115, 22, 0.25), 0 6px 20px rgba(0, 0, 0, 0.15);
         }
         .dark-mode .glass {
-            background: rgba(30, 30, 50, 0.95);
+            background: rgba(40, 25, 20, 0.92);
             color: #e5e7eb;
         }
         .dark-mode .text-gray-800 {
@@ -61,17 +80,23 @@
         }
         .checkbox-custom {
             appearance: none;
-            width: 28px;
-            height: 28px;
-            border: 2px solid #667eea;
-            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f97316;
+            border-radius: 8px;
             cursor: pointer;
             position: relative;
             transition: all 0.3s ease;
             flex-shrink: 0;
         }
         .checkbox-custom:checked {
-            background-color: #667eea;
+            background-color: #f97316;
+            animation: checkSuccess 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes checkSuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         .checkbox-custom:checked::after {
             content: "✓";
@@ -91,6 +116,7 @@
             transition: all 0.2s ease;
             background: white;
             font-size: 13px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .dark-mode .day-selector {
             background: rgba(55, 65, 81, 0.5);
@@ -98,12 +124,16 @@
             color: #e5e7eb;
         }
         .day-selector:hover {
-            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3);
+            border-color: #f97316;
         }
         .day-selector.selected {
-            background: #667eea;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
-            border-color: #667eea;
+            border-color: #f97316;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.5);
+            transform: translateY(-1px);
         }
         .accordion-content {
             max-height: 0;
@@ -114,18 +144,22 @@
             max-height: 500px;
         }
         .progress-bar {
-            transition: width 0.5s ease;
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #f97316 75%, #dc2626 100%);
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .tab-btn {
             padding: 12px 20px;
             border-bottom: 3px solid transparent;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             font-weight: 500;
         }
         .tab-btn.active {
-            border-bottom-color: #667eea;
-            color: #667eea;
+            border-bottom-color: #f97316;
+            color: #f97316;
         }
         .tab-content {
             display: none;
@@ -144,24 +178,62 @@
             font-size: 14px;
         }
         .calendar-day.has-session {
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            font-weight: bold;
+            font-weight: 800;
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
         }
         .badge-card {
-            transition: transform 0.2s ease;
+            transform: scale(1);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         .badge-card:hover {
-            transform: scale(1.05);
+            transform: scale(1.08);
+        }
+        .badge-card:not(.badge-locked) {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
         }
         .badge-locked {
             opacity: 0.4;
             filter: grayscale(100%);
         }
+        button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .bg-gradient-to-br {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        h1 {
+            font-weight: 800;
+        }
+        h2 {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        footer p {
+            font-weight: 600;
+            background: linear-gradient(90deg, #f97316, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
         @media (max-width: 640px) {
             .checkbox-custom {
-                width: 32px;
-                height: 32px;
+                width: 36px;
+                height: 36px;
             }
             .checkbox-custom:checked::after {
                 font-size: 22px;
@@ -206,10 +278,10 @@
                     <span id="progressText" class="text-xs sm:text-sm md:text-base font-medium text-purple-600 whitespace-nowrap ml-2">0/24 séances</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden">
-                    <div id="progressBar" class="progress-bar bg-gradient-to-r from-purple-500 to-indigo-600 h-3 sm:h-4 rounded-full" style="width: 0%"></div>
+                    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
                 </div>
                 <div class="mt-3 flex gap-2 flex-wrap items-center">
-                    <button id="refreshBtn" class="text-xl sm:text-2xl px-2 sm:px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition active:scale-95" title="Rafraîchir">
+                    <button id="refreshBtn" class="text-xl sm:text-2xl px-2 sm:px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition active:scale-95" title="Rafraîchir">
                         🔄
                     </button>
                     <button id="resetBtn" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition active:scale-95" data-i18n="btnReset">
@@ -222,7 +294,7 @@
                         📥 Importer
                     </button>
                     <input type="file" id="importFile" accept=".json" style="display: none;">
-                    <button id="authBtn" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition active:scale-95 flex items-center gap-2">
+                    <button id="authBtn" class="text-xs sm:text-sm px-3 sm:px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition active:scale-95 flex items-center gap-2">
                         🔑 <span id="authBtnText" data-i18n="btnLogin">Se connecter</span>
                     </button>
                     <span id="syncLabel" class="text-xs text-gray-600" style="display:none"></span>
@@ -312,7 +384,7 @@
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-800">Semaines 3-4</h3>
                                 <p class="text-xs sm:text-sm text-gray-600 mt-1">20 minutes</p>
                             </div>
-                            <span class="bg-blue-100 text-blue-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Progression</span>
+                            <span class="bg-orange-100 text-orange-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Progression</span>
                         </div>
                         <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Rythme modéré, capable de parler</p>
 
@@ -370,7 +442,7 @@
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-800">Semaines 5-6</h3>
                                 <p class="text-xs sm:text-sm text-gray-600 mt-1">25 minutes</p>
                             </div>
-                            <span class="bg-yellow-100 text-yellow-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Intermédiaire</span>
+                            <span class="bg-amber-100 text-amber-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Intermédiaire</span>
                         </div>
                         <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Rythme modéré, avec balancement des bras</p>
 
@@ -428,7 +500,7 @@
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-800">Semaines 7-8</h3>
                                 <p class="text-xs sm:text-sm text-gray-600 mt-1">30 minutes</p>
                             </div>
-                            <span class="bg-purple-100 text-purple-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Avancé</span>
+                            <span class="bg-red-100 text-red-800 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Avancé</span>
                         </div>
                         <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Rythme modéré, progression naturelle</p>
 
@@ -490,7 +562,7 @@
                             <h3 class="text-lg sm:text-xl font-bold text-gray-800">Programme continu</h3>
                             <p class="text-xs sm:text-sm text-gray-600 mt-1">30 minutes - 3× par semaine</p>
                         </div>
-                        <span class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Maintien ✨</span>
+                        <span class="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">Maintien ✨</span>
                     </div>
                     <p class="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Félicitations ! Continue à ce rythme pour maintenir ta forme cardiovasculaire.</p>
 
@@ -682,7 +754,7 @@
                     </div>
 
                     <!-- Bouton de sauvegarde -->
-                    <button id="saveProfile" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-lg transition active:scale-95 shadow-lg">
+                    <button id="saveProfile" class="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 px-6 rounded-lg transition active:scale-95 shadow-lg">
                         💾 Sauvegarder mon profil
                     </button>
 
@@ -763,7 +835,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                         <div class="flex space-x-3 sm:space-x-4">
                             <div class="flex-shrink-0">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-full flex items-center justify-center">
                                     <span class="text-xl sm:text-2xl">👀</span>
                                 </div>
                             </div>
@@ -775,7 +847,7 @@
 
                         <div class="flex space-x-3 sm:space-x-4">
                             <div class="flex-shrink-0">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-cyan-100 rounded-full flex items-center justify-center">
                                     <span class="text-xl sm:text-2xl">🔄</span>
                                 </div>
                             </div>
@@ -787,7 +859,7 @@
 
                         <div class="flex space-x-3 sm:space-x-4">
                             <div class="flex-shrink-0">
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center">
                                     <span class="text-xl sm:text-2xl">🏋️</span>
                                 </div>
                             </div>
