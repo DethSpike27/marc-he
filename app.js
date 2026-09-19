@@ -1583,12 +1583,12 @@ function loadUserProfile() {
     document.getElementById('userName').value = profile.name || '';
     document.getElementById('userWeight').value = profile.weight || 250;
     document.getElementById('weightUnit').value = profile.weightUnit || 'lb';
-    document.getElementById('heightUnit').value = profile.heightUnit || 'cm';
+    document.getElementById('heightUnit').value = profile.heightUnit || 'ft';
 
     // Load height based on unit
-    if (profile.heightUnit === 'ft') {
-        document.getElementById('userHeightFeet').value = profile.heightFeet || '';
-        document.getElementById('userHeightInches').value = profile.heightInches || '';
+    if (profile.heightUnit === 'ft' || !profile.heightUnit) {
+        document.getElementById('userHeightFeet').value = profile.heightFeet !== undefined ? profile.heightFeet : 5;
+        document.getElementById('userHeightInches').value = profile.heightInches !== undefined ? profile.heightInches : 6;
     } else {
         document.getElementById('userHeightCm').value = profile.heightCm || '';
     }
