@@ -731,18 +731,30 @@ function initCheckboxes() {
 }
 
 function loadProgress() {
+    console.log('📂 Loading progress from localStorage...');
     const checkboxes = document.querySelectorAll('.checkbox-custom:not(.maintenance-checkbox)');
     const maintenanceCheckboxes = document.querySelectorAll('.maintenance-checkbox');
 
+    let loaded = 0;
     checkboxes.forEach(checkbox => {
         const key = getCheckboxKey(checkbox);
-        checkbox.checked = localStorage.getItem(key) === 'true';
+        const isChecked = localStorage.getItem(key) === 'true';
+        if (checkbox.checked !== isChecked) {
+            checkbox.checked = isChecked;
+            loaded++;
+        }
     });
 
     maintenanceCheckboxes.forEach(checkbox => {
         const key = getCheckboxKey(checkbox);
-        checkbox.checked = localStorage.getItem(key) === 'true';
+        const isChecked = localStorage.getItem(key) === 'true';
+        if (checkbox.checked !== isChecked) {
+            checkbox.checked = isChecked;
+            loaded++;
+        }
     });
+
+    console.log(`✅ Loaded ${loaded} checkbox changes`);
 }
 
 function saveCheckbox(checkbox) {
@@ -1478,12 +1490,17 @@ function initFirebase() {
                 }
 
                 console.log('🔄 Updating UI with synced data...');
+                console.log('📋 Step 1: Loading checkbox progress...');
                 loadProgress();
+                console.log('📊 Step 2: Updating progress bar...');
                 updateProgress();
+                console.log('🏆 Step 3: Rendering badges...');
                 renderBadges();
+                console.log('📅 Step 4: Rendering calendar...');
                 renderCalendar();
+                console.log('📈 Step 5: Updating stats...');
                 updateStats();
-                console.log('✅ UI updated!');
+                console.log('✅ UI fully updated!');
 
                 if (needsPush) {
                     console.log('📤 Pushing local changes to Firebase...');
