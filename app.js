@@ -1584,13 +1584,32 @@ function loadUserProfile() {
     document.getElementById('userWeight').value = profile.weight || 250;
     document.getElementById('weightUnit').value = profile.weightUnit || 'lb';
 
+    // Migration from old single height field to new ft/in system
+    let heightUnit = profile.heightUnit || 'ft';
+
+    // If old format with single 'height' field, migrate it
+    if (profile.height && !profile.heightFeet && !profile.heightCm) {
+        // Old format detected - assume it was in the old 'pi' unit (decimal feet)
+        if (profile.heightUnit === 'pi' || profile.heightUnit === 'ft') {
+            // Convert decimal feet to feet + inches
+            const totalFeet = profile.height;
+            const feet = Math.floor(totalFeet);
+            const inches = Math.round((totalFeet - feet) * 12);
+            profile.heightFeet = feet;
+            profile.heightInches = inches;
+            heightUnit = 'ft';
+        } else {
+            // It was in cm
+            profile.heightCm = profile.height;
+            heightUnit = 'cm';
+        }
+    }
+
     const heightUnitSelect = document.getElementById('heightUnit');
-    const heightUnitValue = profile.heightUnit || 'ft';
-    heightUnitSelect.value = heightUnitValue;
-    console.log('Height unit set to:', heightUnitValue, 'Select value:', heightUnitSelect.value);
+    heightUnitSelect.value = heightUnit;
 
     // Load height based on unit
-    if (profile.heightUnit === 'ft' || !profile.heightUnit) {
+    if (heightUnit === 'ft') {
         document.getElementById('userHeightFeet').value = profile.heightFeet !== undefined ? profile.heightFeet : 5;
         document.getElementById('userHeightInches').value = profile.heightInches !== undefined ? profile.heightInches : 6;
     } else {
