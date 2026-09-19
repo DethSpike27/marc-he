@@ -1405,25 +1405,25 @@ function initFirebase() {
             const data = snapshot.val();
             console.log('📥 Firebase data received:', data ? 'Data exists' : 'No data');
 
-            if (data && data.lastModified) {
+            if (!data) {
+                console.log('⚠️ No data received');
+                return;
+            }
+
+            if (data.lastModified) {
                 updateSyncIndicator(data.lastModified);
             }
 
-            // Skip if this is our own save (but only briefly)
-            if (fbSyncingCount > 0) {
-                console.log('⏭️ Skipping update (own save in progress)');
-                return;
-            }
+            console.log('🔄 Syncing data from Firebase...');
 
-            const hasRemote = !!(data && data.profile !== undefined);
+            const hasRemote = !!(data.profile !== undefined || data.sessions !== undefined);
             const hasLocal = !!(localStorage.getItem('userProfile'));
 
             if (!hasRemote && !hasLocal) {
-                console.log('⚠️ No remote or local data');
+                console.log('⚠️ No remote or local data to sync');
                 return;
             }
 
-            console.log('🔄 Syncing data from Firebase...');
             let needsPush = false;
 
             if (hasRemote) {
@@ -1544,7 +1544,6 @@ function saveToFirebase() {
     }
 
     console.log('Saving to Firebase...');
-    fbSyncingCount++;
     const nowIso = new Date().toISOString();
 
     // Collecter toutes les sessions
@@ -1584,22 +1583,14 @@ function saveToFirebase() {
     };
 
     console.log('Data to save:', dataToSave);
-    console.log('fbSyncingCount before save:', fbSyncingCount);
 
     fbUserRef.set(dataToSave)
     .then(() => {
         console.log('✅ Firebase sync successful!');
         updateSyncIndicator(nowIso);
-        // Reset counter after a brief delay to allow other listeners to settle
-        setTimeout(() => {
-            fbSyncingCount--;
-            console.log('fbSyncingCount after save:', fbSyncingCount);
-        }, 100);
     })
     .catch(err => {
-        fbSyncingCount--;
         console.error('❌ Firebase save error:', err);
-        console.log('fbSyncingCount after error:', fbSyncingCount);
         const errorMsg = currentLanguage === 'fr'
             ? `Erreur de synchronisation : ${err.message}`
             : `Sync error: ${err.message}`;
