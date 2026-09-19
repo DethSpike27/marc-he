@@ -1466,14 +1466,35 @@ function initFirebase() {
                 }
 
                 if (data.sessions) {
-                    // Merge des sessions
+                    console.log('🔄 Merging sessions from Firebase...');
+                    // Merge: Take Firebase values (remote wins)
                     Object.keys(data.sessions).forEach(key => {
+                        const remoteValue = data.sessions[key];
                         const localValue = localStorage.getItem(key);
-                        if (!localValue) {
-                            localStorage.setItem(key, data.sessions[key]);
-                            needsPush = false;
-                        } else if (localValue !== data.sessions[key]) {
+
+                        if (localValue !== remoteValue) {
+                            console.log(`  📝 Updating ${key}: ${localValue} → ${remoteValue}`);
+                            localStorage.setItem(key, remoteValue);
+                        }
+                    });
+
+                    // Check if local has sessions not in remote (need to push)
+                    const allCheckboxes = document.querySelectorAll('.checkbox-custom');
+                    allCheckboxes.forEach(checkbox => {
+                        const key = getCheckboxKey(checkbox);
+                        const localValue = localStorage.getItem(key);
+                        if (localValue && !data.sessions[key]) {
+                            console.log(`  ⬆️ Local session ${key} not in Firebase - will push`);
                             needsPush = true;
+                        }
+                    });
+                }
+
+                if (data.days) {
+                    console.log('🔄 Syncing selected days from Firebase...');
+                    Object.keys(data.days).forEach(key => {
+                        if (data.days[key]) {
+                            localStorage.setItem(key, data.days[key]);
                         }
                     });
                 }
